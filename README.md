@@ -49,4 +49,4 @@ Contributions are welcome! If you have ideas for new features, improvements, or 
 
 ## License
 
-This project is licensed under [MIT License](https://github.com/cyelis1224/Cutscene-Macro-Maker/tree/main?tab=MIT-1-ov-file).
+This project is licensed under [MIT License](LICENSE.MD).
