@@ -2,6 +2,9 @@
 
 The Cutscene Macro Maker (CMM) is a tool designed for Game Masters using Foundry Virtual Tabletop (Foundry VTT) to easily script and execute complex cutscenes with minimal coding knowledge. It provides a user-friendly interface to create sequences of actions like camera movements, scene switches, dialogues, and more, enhancing your storytelling with dynamic visual and audio effects.
 
+![Short Demonstration Video](https://github.com/cyelis1224/Cutscene-Macro-Maker/blob/main/Video_240309004305.gif?raw=true "Demo")
+
+
 ## Features
 
 - **Camera Control**: Pan and zoom the camera to specific locations or tokens.
