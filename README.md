@@ -37,8 +37,7 @@ The Cutscene Macro Maker (CMM) is a tool designed for Game Masters using Foundry
 1. Open the Cutscene Macro Maker dialog by executing the script in a macro or directly in the console.
 2. Click on the action buttons to configure each part of your cutscene. A dialog specific to the selected action will guide you through the setup.
 3. After configuring an action, it will be added to the cutscene script. Continue adding actions as desired.
-4. Use the **Test Run** button to preview the cutscene.
-5. Once satisfied, click the **Export Macro** button to save the script. You can then copy the script to a new macro for execution during your game session.
+4. Once satisfied, click the **Export Macro** button to save the script. From this dialog you can do a Test Run of your cutscene. You can then copy the script to a new macro for execution during your game session or some other means of triggering the action sequence like Monks Active Tiles.
 
 ## Customization
 
