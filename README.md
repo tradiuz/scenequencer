@@ -17,7 +17,7 @@ The Cutscene Macro Maker (CMM) is a tool designed for Game Masters using Foundry
 - **Light State**: Toggle lights on or off, simulating changes in the environment.
 - **Ambient Sound**: Control ambient sounds to enhance the atmosphere.
 - **Image Display**: Show images to players for storytelling or clues.
-- **Animations**: Play animations for spell effects, environmental changes, etc.
+- **Animations**: Play animations for spell effects, environmental changes, etc. (Requires the Sequencer Module)
 - **Sound Playback**: Include sound effects or voiceovers.
 - **Playlist Control**: Change the background music playlist to match the mood.
 - **Fade In/Out**: Gradually fade the screen to or from black for transitions.
