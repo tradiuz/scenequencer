@@ -4,21 +4,33 @@ The Cutscene Macro Maker (CMM) is a tool designed for Game Masters using Foundry
 
 ## Features
 
-- **Camera Control**: Pan the camera to a specific location or token.
-- **Scene Switching**: Seamlessly switch between scenes.
-- **Dialogues and Chat Messages**: Display chat messages as part of the cutscene.
-- **Token Movement**: Animate tokens moving across the map.
-- **Visibility Toggle**: Show or hide tokens and tiles.
-- **Screen Effects**: Add screen flash and shake effects for dramatic moments.
-- **Conditional Branches**: Present choices to players that can alter the flow of the cutscene.
-- **Ambient Sound and Music**: Control background music and ambient sounds.
-- **Special Effects**: Incorporate weather effects, animations, and lighting changes.
-- **User Interface Control**: Show or hide the UI for immersive cutscenes.
+- **Camera Control**: Pan and zoom the camera to specific locations or tokens.
+- **Scene Switching**: Seamlessly switch between different scenes.
+- **Token Movement**: Animate multiple tokens moving across the map.
+- **Token Visibility**: Show or hide tokens dynamically.
+- **Chat and Dialogues**: Display chat messages or dialogues as part of the cutscene.
+- **Conditional Branches**: Offer players choices that can change the course of the cutscene.
+- **Screen Flash**: Add dramatic screen flash effects.
+- **Screen Shake**: Create intense moments with screen shake effects.
+- **Tile Movement**: Animate the movement of tiles within the scene.
+- **Door State**: Open, close, lock, or unlock doors within the scene.
+- **Light State**: Toggle lights on or off, simulating changes in the environment.
+- **Ambient Sound**: Control ambient sounds to enhance the atmosphere.
+- **Image Display**: Show images to players for storytelling or clues.
+- **Animations**: Play animations for spell effects, environmental changes, etc.
+- **Sound Playback**: Include sound effects or voiceovers.
+- **Playlist Control**: Change the background music playlist to match the mood.
+- **Fade In/Out**: Gradually fade the screen to or from black for transitions.
+- **UI Control**: Hide or show the UI for an immersive experience.
+- **Weather/Particle Effects**: Simulate weather or special particle effects.
+- **Location Banner**: Display a location banner or room key for new scene introductions.
+- **Run Macro**: Execute other macros as part of the cutscene.
+- **Wait**: Add pauses or delays between actions for timing control.
+- **Export Macro**: Easily export the created cutscene as a Foundry VTT macro.
 
 ## Installation
 
-1. **Manual Installation**: Download the latest release from GitHub and extract it into your Foundry VTT's `Data/modules` directory.
-2. **Add Module in Foundry**: Open your Foundry VTT, go to the **Game Settings** tab, select **Manage Modules**, and enable **Cutscene Macro Maker**.
+1. **Installation**: Paste the contents of the cutscenemacromaker.js file into a macro and set the type to script, executing this macro will open the cutscene macro maker dialog.
 
 ## Usage
 
