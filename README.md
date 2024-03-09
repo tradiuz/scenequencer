@@ -49,4 +49,4 @@ Contributions are welcome! If you have ideas for new features, improvements, or 
 
 ## License
 
-This project is licensed under [MIT License](LICENSE.MD).
+This project is licensed under [MIT License](LICENSE).
