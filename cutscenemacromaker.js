@@ -44,7 +44,7 @@ function openInitialDialog() {
       <div class="cutscene-maker-button" id="hideUIButton">Hide UI</div>
       <div class="cutscene-maker-button" id="showUIButton">Show UI</div>
       <div class="cutscene-maker-button" id="effectsButton">Weather/Particle Effects</div>
-      <div class="cutscene-maker-button" id="locationBannerButton">Location Banner</div>
+      <div class="cutscene-maker-button" id="locationBannerButton">Location Banner (broken)</div>
       <div class="cutscene-maker-button" id="macroButton">Run Macro</div>
       <div class="cutscene-maker-button" id="waitButton">Wait</div>
       <div class="cutscene-maker-finish" id="finishButton">Export Macro</div>
