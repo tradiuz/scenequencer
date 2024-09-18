@@ -125,18 +125,24 @@ function addSwitchSceneAction() {
         <div class="form-group">
           <label for="sceneId">Scene ID:</label>
           <input type="text" id="sceneId" name="sceneId" placeholder="Enter the scene ID here" style="width: 100%;">
+          <p>Enter the ID of the scene you wish to switch to.</p>
         </div>
+        <div class="form-group">
+            <label for="sceneActivate">Activate:</label>
+            <input type="checkbox" id="sceneActivate" name="sceneActivate" style="margin-top: 5px;">
+        <p style="font-size: 0.8em; margin-top: 5px;">Activate instead of just changing the scene.</p>
+      </div>
       </form>
-      <p>Enter the ID of the scene you wish to switch to.</p>
     `, buttons: {
             add: {
                 label: "Add Scene Switch", callback: html => {
                     const sceneId = html.find("#sceneId").val();
+                    const sceneActivate = html.find("#sceneActivate")[0].checked;
                     cutsceneActions.push(`//SCENE - CHANGE
               .thenDo(async function() {
                 const scene = game.scenes.get("${sceneId}");
                 if (scene) {
-                  await scene.view();
+                  await scene.${sceneActivate ? `activate` : `view`}();
                   console.log("Switched to scene: " + scene.name);
                 } else {
                   console.error("Scene not found with ID: ${sceneId}");
@@ -185,12 +191,12 @@ function addChatCommandAction() {
     }).render(true);
 }
 function addTokenMovementAction() {
-    if (canvas.tokens.controlled.length !== 1) {
-        ui.notifications.warn("Please select exactly one token.");
+    if (canvas.tokens.controlled.length < 1) {
+        ui.notifications.warn("Please select at least one token.");
         openInitialDialog();
         return;
     }
-    const selectedToken = canvas.tokens.controlled[0];
+    const selectedTokens = canvas.tokens.controlled;
     new Dialog({
         title: "Token Movement", content: `
         <p>Move the selected token to the new position, then click OK.</p>
@@ -209,13 +215,14 @@ function addTokenMovementAction() {
       `, buttons: {
             ok: {
                 label: "OK", callback: html => {
-                    const newPosition = { x: selectedToken.x, y: selectedToken.y };
-                    const animatePan = html.find("#animatePan")[0].checked;
-                    const teleport = html.find("#teleport")[0].checked;
-                    const panDuration = 1000;
-                    const moveDuration = 1000;
-                    let tokenMovementScript;
-                    tokenMovementScript = `//TOKEN - MOVEMENT
+                    selectedTokens.map(selectedToken => {
+                        const newPosition = { x: selectedToken.x, y: selectedToken.y };
+                        const animatePan = html.find("#animatePan")[0].checked;
+                        const teleport = html.find("#teleport")[0].checked;
+                        const panDuration = 1000;
+                        const moveDuration = 1000;
+                        let tokenMovementScript;
+                        tokenMovementScript = `//TOKEN - MOVEMENT ${selectedToken.name}
     ${animatePan ? `.canvasPan("${selectedToken.id}")
         .duration(${panDuration})
         .waitUntilFinished()` : ""}
@@ -227,7 +234,8 @@ function addTokenMovementAction() {
         .duration(${panDuration})
         .waitUntilFinished()` : ""}                  
                     `;
-                    cutsceneActions.push(tokenMovementScript.trim());
+                        cutsceneActions.push(tokenMovementScript.trim());
+                    });
                     ui.notifications.info(`Token ${teleport ? "teleported" : "movement"} action added to the cutscene.`);
                     openInitialDialog();
                 }
