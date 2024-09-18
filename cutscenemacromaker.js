@@ -44,7 +44,7 @@ function openInitialDialog() {
       <div class="cutscene-maker-button" id="hideUIButton">Hide UI</div>
       <div class="cutscene-maker-button" id="showUIButton">Show UI</div>
       <div class="cutscene-maker-button" id="effectsButton">Weather/Particle Effects</div>
-      <div class="cutscene-maker-button" id="locationBannerButton">Location Banner (broken)</div>
+      <div class="cutscene-maker-button" id="showModalButton">Modal</div>
       <div class="cutscene-maker-button" id="macroButton">Run Macro</div>
       <div class="cutscene-maker-button" id="waitButton">Wait</div>
       <div class="cutscene-maker-finish" id="finishButton">Export Macro</div>
@@ -77,7 +77,7 @@ function openInitialDialog() {
             html.find("#fadeinButton").click(() => closeDialogAndExecute(addFadeAction(1)));
             html.find("#hideUIButton").click(() => closeDialogAndExecute(addUIAction(0)));
             html.find("#showUIButton").click(() => closeDialogAndExecute(addUIAction(1)));
-            html.find("#locationBannerButton").click(() => closeDialogAndExecute(addlocationBannerAction));
+            html.find("#showModalButton").click(() => closeDialogAndExecute(addShowModalAction));
             html.find("#finishButton").click(() => closeDialogAndExecute(outputCutsceneScript));
         }
     });
@@ -218,10 +218,10 @@ function addTokenMovementAction() {
                     tokenMovementScript = `//TOKEN - MOVEMENT
     ${animatePan ? `.canvasPan("${selectedToken.id}")
         .duration(${panDuration})
-        .waitUntilFinished()` :""  }
+        .waitUntilFinished()` : ""}
     .animation()
         .on("${selectedToken.id}")
-    ${teleport ? '.teleportTo' : '.moveTowards' }({ x: ${newPosition.x}, y: ${newPosition.y}}) 
+    ${teleport ? '.teleportTo' : '.moveTowards'}({ x: ${newPosition.x}, y: ${newPosition.y}}) 
         .duration(${moveDuration})
     ${animatePan ? `.canvasPan({ x: ${newPosition.x}, y: ${newPosition.y}})
         .duration(${panDuration})
@@ -236,18 +236,20 @@ function addTokenMovementAction() {
     }).render(true);
 }
 function addVisibilityAction(visible = true) {
-    if (canvas.tokens.controlled.length !== 1) {
-        ui.notifications.warn("Please select exactly one token.");
+    if (canvas.tokens.controlled.length < 1) {
+        ui.notifications.warn("Please select one or more tokens.");
         openInitialDialog();
         return;
     }
-    const selectedToken = canvas.tokens.controlled[0];
-    cutsceneActions.push(`//TOKEN - ${visible ? 'SHOW' : 'HIDE'}
+    const selectedTokens = canvas.tokens.controlled;
+    selectedTokens.map(t => {
+        cutsceneActions.push(`//TOKEN - ${visible ? 'SHOW' : 'HIDE'} - ${t.name}
     .animation()
-        .on("${selectedToken.id}")
+        .on("${t.id}")
         .show(${visible})
   `);
-    ui.notifications.info("Token hide action added to the cutscene script.");
+    });
+    ui.notifications.info(`Token ${visible ? 'show' : 'hide'} action added to the cutscene script.`);
     openInitialDialog();
 }
 function addRunMacroAction() {
@@ -270,7 +272,7 @@ function addRunMacroAction() {
                     const macroName = html.find("#macroName").val();
                     const macroArgs = html.find("#macroArgs").val();
                     cutsceneActions.push(`
-            .macro("${macroName}",${macroArgs ?? `{}` })
+            .macro("${macroName}",${macroArgs ?? `{}`})
           `.trim());
                     ui.notifications.info("Run Macro added to the cutscene script.");
                     openInitialDialog();
@@ -331,7 +333,7 @@ function addScreenFlashAction() {
                     const flashDuration = parseInt(html.find("#flashDuration").val());
                     const flashWait = html.find("#flashWait")[0].checked;
                     cutsceneActions.push(`//SCREEN - FLASH
-            .thenDo( ${flashWait ? "async" :'' } function() {
+            .thenDo( ${flashWait ? "async" : ''} function() {
               const flashEffect = document.createElement("div");
               flashEffect.style.position = "fixed";
               flashEffect.style.left = 0;
@@ -435,7 +437,7 @@ function addTileMovementAction() {
                         return `
     .animation()
         .on("${tile.id}")
-        ${!animate ? '.teleportTo' : '.moveTowards' }({ x: ${tile.x}, y: ${tile.y}}) 
+        ${!animate ? '.teleportTo' : '.moveTowards'}({ x: ${tile.x}, y: ${tile.y}}) 
         .duration(${moveDuration})`
                     }).join('\n')}
           `;
@@ -838,19 +840,19 @@ function addFadeAction(brightness) {
 }
 function addUIAction(opacity) {
     new Dialog({
-        title: `${opacity ? "Show":"Hide"} UI Settings`, content: `
+        title: `${opacity ? "Show" : "Hide"} UI Settings`, content: `
         <form>
             <div class="form-group">
                 <label for="duration">Transition Duration (in milliseconds):</label>
                 <input type="number" id="duration" name="duration" value="500" step="100" style="width: 100%;">
             </div>
         </form>
-        <p>The UI will ${opacity ? "appear":"disappear"} over the specified duration.</p>
+        <p>The UI will ${opacity ? "appear" : "disappear"} over the specified duration.</p>
     `, buttons: {
             ok: {
                 label: "Add", callback: html => {
                     const duration = html.find("#duration").val();
-                    cutsceneActions.push(`// UI - HIDE
+                    cutsceneActions.push(`// UI - ${opacity ? `SHOW` : `HIDE`}
     .macro("modify-ui",{opacity: '${opacity}'})
     .wait(${duration})`);
                     ui.notifications.info("UI hide action added to the cutscene script.");
@@ -860,64 +862,34 @@ function addUIAction(opacity) {
         }, default: "ok"
     }).render(true);
 }
-function addlocationBannerAction() {
+function addShowModalAction() {
     new Dialog({
-        title: "Location Banner Action", content: `
+        title: "Modal Action", content: `
       <form>
         <div class="form-group">
-          <label for="roomName">Room Name:</label>
-          <input type="text" id="roomName" name="roomName" style="width: 100%;">
+          <label for="modalHeader">Title:</label>
+          <input type="text" id="modalHeader" name="modalHeader" style="width: 100%;">
         </div>
         <div class="form-group">
-          <label for="roomDescription">Description:</label>
-          <textarea id="roomDescription" name="roomDescription" rows="4" style="width: 100%;"></textarea>
+          <label for="modalDescription">Description:</label>
+          <textarea id="modalDescription" name="modalDescription" rows="4" style="width: 100%;"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="modalDuration">Duration (ms):</label>
+          <input type="number" id="modalDuration" name="modalDuration" style="width: 100%;" value=5000 step=100>
         </div>
       </form>
     `, buttons: {
             ok: {
                 label: "Add", callback: html => {
-                    roomName = html.find("#roomName").val();
-                    description = html.find("#roomDescription").val();
+                    modalHeader = html.find("#modalHeader").val();
+                    description = html.find("#modalDescription").val();
+                    duration = html.find("#modalDuration").val();
                     imageUrl = "modules/scenequencer/assets/banner.webp";
-                    locationBannerActionScript = `
-            .thenDo(async function() {
-              let header = document.createElement('div');
-              header.style.position = 'fixed';
-              header.style.top = '20%';
-              header.style.left = '50%';
-              header.style.transform = 'translate(-50%, -50%)';
-              header.style.width = 'auto';
-              header.style.minWidth = '400px'; 
-              header.style.height = '150px'; 
-              header.style.padding = '10px';
-              header.style.zIndex = 100;
-              header.style.borderRadius = '10px';
-              header.style.backgroundImage = 'url(' + \`${imageUrl}\` + ')';
-              header.style.backgroundSize = 'contain'; 
-              header.style.backgroundRepeat = 'no-repeat'; 
-              header.style.color = 'white'; 
-              header.style.display = 'flex';
-              header.style.flexDirection = 'column';
-              header.style.justifyContent = 'flex-start'; 
-              header.style.alignItems = 'center'; 
-              header.style.fontSize = '3.5em';
-              header.style.opacity = 0;
-              header.style.transition = 'opacity 1s';
-              header.style.fontFamily = 'Bruno Ace';
-              header.style.color = '#ff9900';
-              header.innerHTML = '<strong>' + \`${roomName}\` + '</strong> ' + \`${description}\`;
-
-              document.body.appendChild(header);
-
-              setTimeout(() => header.style.opacity = 1, 100);
-
-              setTimeout(() => {
-                header.style.opacity = 0;
-                setTimeout(() => header.remove(), 1000); 
-              }, 5000);
-            })
-          `;
-                    cutsceneActions.push(locationBannerActionScript.trim());
+                    cutsceneActions.push(`// MODAL
+    .macro("modal-popup",{title: '${modalHeader}', body: '${description}', duration: '${duration}'})
+    .wait(${duration})
+                    `);
                     ui.notifications.info("Room Key added to the cutscene script.");
                     openInitialDialog();
                 }
@@ -943,7 +915,7 @@ ${cutsceneActions.join("\n\n")}
                 callback: html => {
                     const scriptToRun = html.find("#cutsceneScriptOutput").val();
                     const asyncScript = `(async () => { ${scriptToRun} })();`;
-                    
+
                     try {
                         new Function(asyncScript)();
                         ui.notifications.info("Test run executed successfully.");
@@ -959,8 +931,8 @@ ${cutsceneActions.join("\n\n")}
             edit: {
                 label: "Edit",
                 callback: html => {
-                    const updatedScript = html.find("#cutsceneScriptOutput").val();
-                    cutsceneActions = updatedScript.split("\n\n").filter(action => action.trim() !== "");
+                    //const updatedScript = html.find("#cutsceneScriptOutput").val();
+                    //cutsceneActions = updatedScript.split("\n\n").filter(action => action.trim() !== "");
                     openInitialDialog();
                 }
             },
