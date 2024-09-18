@@ -24,7 +24,7 @@ function openInitialDialog() {
   </style>
   <div class="cutscene-maker-buttons">
       <div class="cutscene-maker-button" id="cameraButton">Camera</div>
-      <div class="cutscene-maker-button" id="sceneButton">Switch Scene</div>
+      <div class="cutscene-maker-button" id="sceneButton">Switch Scene ⚠</div>
       <div class="cutscene-maker-button" id="showButton">Show Token</div>
       <div class="cutscene-maker-button" id="hideButton">Hide Token</div>
       <div class="cutscene-maker-button" id="movementButton">Token Movement</div>
@@ -133,6 +133,7 @@ function addSwitchSceneAction() {
         <p style="font-size: 0.8em; margin-top: 5px;">Activate instead of just changing the scene.</p>
       </div>
       </form>
+      <p><strong>This currently will break flows!<strong></p>
     `, buttons: {
             add: {
                 label: "Add Scene Switch", callback: html => {
@@ -861,7 +862,7 @@ function addUIAction(opacity) {
                 label: "Add", callback: html => {
                     const duration = html.find("#duration").val();
                     cutsceneActions.push(`// UI - ${opacity ? `SHOW` : `HIDE`}
-    .macro("modify-ui",{opacity: '${opacity}'})
+    .macro("modify-ui",{opacity: '${opacity}', duration: ${duration}})
     .wait(${duration})`);
                     ui.notifications.info("UI hide action added to the cutscene script.");
                     openInitialDialog();
