@@ -28,6 +28,7 @@ function openInitialDialog() {
   </style>
   <div class="cutscene-maker-buttons">
       <div class="cutscene-maker-button" id="cameraButton">Camera</div>
+      <div class="cutscene-maker-button" id="introButton">Boss Intro</div>
       <div class="cutscene-maker-button" id="sceneButton">Switch Scene ⚠</div>
       <div class="cutscene-maker-button" id="showButton">Show Token</div>
       <div class="cutscene-maker-button" id="hideButton">Hide Token</div>
@@ -60,6 +61,7 @@ function openInitialDialog() {
                 actionFunction();
             };
             html.find("#cameraButton").click(() => closeDialogAndExecute(addCameraPositionAction));
+            html.find("#introButton").click(() => closeDialogAndExecute(addBossIntroAction));
             html.find("#sceneButton").click(() => closeDialogAndExecute(addSwitchSceneAction));
             html.find("#chatButton").click(() => closeDialogAndExecute(addChatCommandAction));
             html.find("#theatreButton").click(() => closeDialogAndExecute(addTheatreCommandAction));
@@ -543,6 +545,53 @@ function addScreenShakeAction() {
         }, default: "add"
     }).render(true);
 }
+
+function addBossIntroAction() {
+    new Dialog({
+        title: "Add Boss Intro Effect", content: `
+    <form>
+        <div class="form-group">
+        <label for="introPath">Boss intro video:</label>
+        <input type="text" id="introPath" name="introPath" style="width: 100%;">
+    </div>
+    <div class="form-group">
+        <label for="introDesaturate">Desaturate:</label>
+        <input type="checkbox" id="introDesaturate" name="introDesaturate" checked style="margin-top: 5px;">
+    </div>
+    <div class="form-group">
+        <label for="introWait">Wait until finished:</label>
+        <input type="checkbox" id="introWait" name="introWait" checked style="margin-top: 5px;">
+    </div>
+    </form>
+    `, buttons: {
+            add: {
+                label: "Add Boss Intro Effect", callback: html => {
+                    const path = html.find("#introPath").val();
+                    const wait = html.find("#introWait")[0].checked;
+                    const desaturate = html.find("#introDesaturate")[0].checked;
+                    cutsceneActions.push(`//BOSS INTRO
+    ${desaturate ? `.thenDo(function () {
+        FXMASTER.filters.addFilter("desaturation", "color", { color: { apply: false }, saturation: 0 });
+    })`: ''}
+    .effect()
+        .screenSpace()
+        .screenSpaceAboveUI()
+        .screenSpaceScale({
+            x: 1.0, fitX: true, ratioY: true
+        }).file("${path}")
+        ${wait ? ".waitUntilFinished(500)" : ''}
+        ${desaturate ? `.thenDo(function () {
+            FXMASTER.filters.removeFilter("desaturation");
+        })`: ''}
+            `);
+                    ui.notifications.info("Screen shake effect added to the cutscene script.");
+                    openInitialDialog();
+                }
+            }, cancel: { label: "Cancel", callback: () => openInitialDialog() }
+        }, default: "add"
+    }).render(true);
+}
+
 function addTileMovementAction() {
     if (canvas.tiles.controlled.length < 1) {
         ui.notifications.warn("Please select at least one tile.");
