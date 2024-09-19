@@ -1,3 +1,7 @@
+/*
+Requires Advanced Macros and the two helper macros for player side UI things (modal and hide UI)
+*/
+
 let cutsceneActions = [];
 function openInitialDialog() {
     let d = new Dialog({
@@ -29,6 +33,7 @@ function openInitialDialog() {
       <div class="cutscene-maker-button" id="hideButton">Hide Token</div>
       <div class="cutscene-maker-button" id="movementButton">Token Movement</div>
       <div class="cutscene-maker-button" id="chatButton">Chat</div>
+      <div class="cutscene-maker-button" id="theatreButton">Theatre</div>
       <div class="cutscene-maker-button" id="flashButton">Screen Flash</div>
       <div class="cutscene-maker-button" id="shakeButton">Screen Shake</div>
       <div class="cutscene-maker-button" id="tileButton">Tile Movement</div>
@@ -57,6 +62,7 @@ function openInitialDialog() {
             html.find("#cameraButton").click(() => closeDialogAndExecute(addCameraPositionAction));
             html.find("#sceneButton").click(() => closeDialogAndExecute(addSwitchSceneAction));
             html.find("#chatButton").click(() => closeDialogAndExecute(addChatCommandAction));
+            html.find("#theatreButton").click(() => closeDialogAndExecute(addTheatreCommandAction));
             html.find("#movementButton").click(() => closeDialogAndExecute(addTokenMovementAction));
             html.find("#hideButton").click(() => closeDialogAndExecute(addVisibilityAction(false)));
             html.find("#showButton").click(() => closeDialogAndExecute(addVisibilityAction(true)));
@@ -191,6 +197,126 @@ function addChatCommandAction() {
         }, default: "ok"
     }).render(true);
 }
+
+
+function addTheatreCommandAction() {
+    if (canvas.tokens.controlled.length !== 1) {
+        ui.notifications.warn("Please select exactly one token.");
+        openInitialDialog();
+        return;
+    }
+    const selectedToken = canvas.tokens.controlled[0];
+    new Dialog({
+        title: "Theatre Command", content: `
+      <form>
+        <div class="form-group">
+          <label for="messageContent">Message:</label>
+          <textArea rows=4 id="messageContent" name="messageContent" style="width: 100%;"></textArea>
+        </div>
+        <div class="form-group">
+        <label for="messageDelay">Duration (ms):</label>
+        <input type="number" id="messageDelay" name="messageDelay"  style="width: 20%;">
+        <p style="font-size: 0.8em; margin-top: 5px;">Leave blank for auto-calculated based on message length.</p>
+      </div>
+      <div class="form-group">
+            <label for="messageWait">Wait for completion:</label>
+            <input type="checkbox" id="messageWait" name="messageWait" value="0" style="margin-top: 5px;">
+            
+          </div>
+      </form>
+      <p>Enter the message you want the selected token to say in chat. This will be added to your cutscene script.</p>
+    `, buttons: {
+            ok: {
+                label: "Add", callback: html => {
+                    const messageContent = html.find("#messageContent").val();
+                    const messageDelay = html.find("#messageDelay").val() ? html.find("#messageDelay").val() : messageContent.length * 100 + 1000;
+                    const messageWait = html.find("#messageWait")[0].checked;
+                    cutsceneActions.push(`//THEATRE
+    .thenDo(async function () {
+        if (!theatre.getNavItemById(theatreId)?.className.includes('theatre-control-nav-bar-item-speakingas')) {
+            Theatre.instance.activateInsertById(theatreId, { button: 0, currentTarget: theatre.getNavItemById("theatre-${selectedToken.actor.id}") });
+        }
+    })
+    .wait(1000)
+    .thenDo(async function () {
+        let theatreId = "theatre-${selectedToken.actor.id}";
+        let textContent = "${messageContent}";
+        let messageDelay = ${messageDelay};
+        let textBox = Theatre.instance.getTextBoxById(theatreId);
+        let insert = Theatre.instance.getInsertById(theatreId);
+        let charSpans = [];
+        // replace newlines
+        textContent = textContent.replace(/<br(| \\/)>/g, "\\n");
+        // convert all html specials to plaintext
+        let txtTemp = document.createElement("hiddentext");
+        txtTemp.innerHTML = textContent;
+        textContent = txtTemp.textContent;
+        if (textBox) {
+            // kill all tweens
+            for (let c of textBox.children) {
+                for (let sc of c.children) TweenMax.killTweensOf(sc);
+                TweenMax.killTweensOf(c);
+            }
+            for (let c of textBox.children) c.parentNode.removeChild(c);
+            TweenMax.killTweensOf(textBox);
+            textBox.style["overflow-y"] = "scroll";
+            textBox.style["overflow-x"] = "hidden";
+            textBox.textContent = "";
+            let insertFlyinMode = insert.textFlyin ?? "typewriter";
+            let insertStandingMode = insert.textStanding ?? null;
+            let insertFontType = insert.textFont ?? null;
+            let insertFontSize = Number(insert.textSize) ?? null;
+            let insertFontColor = insert.textColor ?? null;
+            let fontSize = Number(textBox.getAttribute("osize") || 28);
+            switch (insertFontSize) {
+                case 3:
+                    fontSize *= 1.5;
+                    break;
+                case 1:
+                    fontSize *= 0.5;
+                    break;
+                default:
+                    break;
+            }
+            Theatre.instance._applyFontFamily(textBox, insertFontType || Theatre.instance.textFont);
+            textBox.style.color = insertFontColor || "white";
+            textBox.style["font-size"] = \`\${fontSize}px\`;
+            textBox.scrollTop = 0;
+            charSpans = Theatre.splitTextBoxToChars(textContent, textBox);
+            Theatre.textFlyinAnimation(insertFlyinMode || "typewriter").call(
+                this,
+                charSpans,
+                0.5,
+                0.05,
+                Theatre.textStandingAnimation(insertStandingMode),
+            );
+            if (insert && insert.decayTOId) {
+                window.clearTimeout(insert.decayTOId);
+            }
+            if (insert && Theatre.instance.settings.autoDecay) {
+                insert.decayTOId = window.setTimeout(
+                    (imgId) => {
+                        let insert = Theatre.instance.getInsertById(imgId);
+                        if (insert) Theatre.instance.decayTextBoxById(imgId, true);
+                    },
+                    Math.max(Theatre.instance.settings.decayRate * charSpans.length, Theatre.instance.settings.decayMin),
+                    insert.imgId,
+                );
+            }
+        }
+        //Do the delay here instead of slowing the whole sequence.
+        setTimeout(() => { Theatre.instance.removeInsertById(theatreId) }, (messageDelay));
+    })
+    ${messageWait ? `.wait(${messageDelay + 2000})` : ''}
+          `.trim());
+                    ui.notifications.info("Theatre command action added to the cutscene script.");
+                    openInitialDialog();
+                }
+            }, cancel: { label: "Cancel", callback: () => openInitialDialog() }
+        }, default: "ok"
+    }).render(true);
+}
+
 function addTokenMovementAction() {
     if (canvas.tokens.controlled.length < 1) {
         ui.notifications.warn("Please select at least one token.");
