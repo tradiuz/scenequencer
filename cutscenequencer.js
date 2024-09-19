@@ -233,6 +233,7 @@ function addTheatreCommandAction() {
                     const messageWait = html.find("#messageWait")[0].checked;
                     cutsceneActions.push(`//THEATRE
     .thenDo(async function () {
+        let theatreId = "theatre-${selectedToken.actor.id}";
         if (!theatre.getNavItemById(theatreId)?.className.includes('theatre-control-nav-bar-item-speakingas')) {
             Theatre.instance.activateInsertById(theatreId, { button: 0, currentTarget: theatre.getNavItemById("theatre-${selectedToken.actor.id}") });
         }
