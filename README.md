@@ -2,6 +2,8 @@
 
 The Cutscenequencer Macro  is a tool designed for Game Masters using Foundry Virtual Tabletop (Foundry VTT) to easily script and execute complex cutscenes with minimal coding knowledge. It provides a user-friendly interface to create sequences of actions like camera movements, scene switches, dialogues, and more, enhancing your storytelling with dynamic visual and audio effects.
 
+This fork was redone to leverage sequencer to make all actions serialized.
+
 ## Features
 
 - **Camera Control**: Pan and zoom the camera to specific locations or tokens.
@@ -29,9 +31,15 @@ The Cutscenequencer Macro  is a tool designed for Game Masters using Foundry Vir
 
 ## Installation
 
-1. **Main Installation**: Paste the contents of the cutscenequencer.js file into a macro and set the type to script, executing this macro will open the cutscene macro maker dialog.
-2. **Helper Macros**: Paste the contents of modify-ui.js into a macro called `modify-ui` and the contents of modal-popup.js into a macro called `modal-popup`
-3. Configure the ownership of `modal-popup` and `modify-ui` to be "limited" for all players.  Configure both to execute as all users.
+### Main Installation
+
+1. Paste the contents of the cutscenequencer.js file into a macro and set the type to script, executing this macro will open the cutscene macro maker dialog.
+
+### Helper Macros
+
+1. Paste the contents of modify-ui.js into a macro called `modify-ui` and the contents of modal-popup.js into a macro called `modal-popup`
+2. Configure the ownership of `modal-popup` and `modify-ui` to be "limited" for all players.  
+3. Configure both to execute as all users.
 
 ## Usage
 

@@ -411,29 +411,20 @@ function addScreenFlashAction() {
                     const flashDuration = parseInt(html.find("#flashDuration").val());
                     const flashWait = html.find("#flashWait")[0].checked;
                     cutsceneActions.push(`//SCREEN - FLASH
-            .thenDo( ${flashWait ? "async" : ''} function() {
-              const flashEffect = document.createElement("div");
-              flashEffect.style.position = "fixed";
-              flashEffect.style.left = 0;
-              flashEffect.style.top = 0;
-              flashEffect.style.width = "100vw";
-              flashEffect.style.height = "100vh";
-              flashEffect.style.backgroundColor = "${flashColor}";
-              flashEffect.style.opacity = ${flashOpacity};
-              flashEffect.style.pointerEvents = "none";
-              flashEffect.style.zIndex = "10000";
-              document.body.appendChild(flashEffect);
-
-              setTimeout(() => {
-                flashEffect.style.transition = "opacity ${flashDuration}ms";
-                flashEffect.style.opacity = 0;
-              }, 50); 
-
-              setTimeout(() => {
-                flashEffect.remove();
-              }, ${flashDuration} + 50); 
-            })
-          `);
+    .effect()
+        .shape("circle",{
+            fillColor: "${flashColor}", 
+            fillAlpha:${flashOpacity},
+            radius: 1
+        })
+        .screenSpace()
+        .screenSpaceAboveUI()
+        .screenSpaceScale({fitX: true, fitY: true})
+        .fadeIn(100)
+        .duration(${flashDuration})
+        .fadeOut(${flashDuration / 2})
+        ${flashWait ? `.waitUntilFinished()` : ""}
+                    `);
                     ui.notifications.info("Screen flash effect added to the cutscene script.");
                     openInitialDialog();
                 }
