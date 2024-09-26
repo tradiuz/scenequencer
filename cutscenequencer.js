@@ -935,33 +935,12 @@ function addPlayPlaylistAction() {
     }).render(true);
 }
 function addFadeAction(brightness) {
-    new Dialog({
-        title: "Fade Settings", content: `
-          <form>
-              <div class="form-group">
-                  <label for="fadeDuration">Fade Duration (in milliseconds):</label>
-                  <input type="number" id="fadeDuration" name="fadeDuration" value="2000" step="100" style="width: 100%;">
-              </div>
-          </form>
-          <p>The screen will fade from ${brightness ? "normal to black" : "black to normal"} over the specified duration.</p>
-      `, buttons: {
-            ok: {
-                label: "Add", callback: html => {
-                    const fadeDuration = html.find("#fadeDuration").val();
-                    cutsceneActions.push(`
-                    .thenDo(async function(){
-                        canvasElement = document.querySelector("canvas#board");
-                        canvasElement.style.transition = "filter ${fadeDuration}ms ease-in-out";
-                        canvasElement.style.filter = "brightness(${brightness})";
-                        await new Promise(resolve => setTimeout(resolve, ${fadeDuration}));
-          })
-                  `);
-                    ui.notifications.info("Fade-in effect added to the cutscene script.");
-                    openInitialDialog();
-                }
-            }, cancel: { label: "Cancel", callback: () => openInitialDialog() }
-        }, default: "ok"
-    }).render(true);
+    cutsceneActions.push(`//FADE ${brightness ? "IN" : "OUT"}
+    .thenDo(async function(){
+        FXMASTER.filters.${brightness ? `removeFilter("cs-fadeout")` : `addFilter("cs-fadeout", "color", {color: {apply: false },brightness: ${brightness}})`};
+    })`);
+    ui.notifications.info("Fade-in effect added to the cutscene script.");
+    openInitialDialog();
 }
 function addUIAction(opacity) {
     new Dialog({
