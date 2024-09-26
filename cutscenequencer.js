@@ -240,75 +240,15 @@ function addTheatreCommandAction() {
             Theatre.instance.activateInsertById(theatreId, { button: 0, currentTarget: theatre.getNavItemById("theatre-${selectedToken.actor.id}") });
         }
     })
-    .wait(1000)
+    .wait(1500)
     .thenDo(async function () {
-        let theatreId = "theatre-${selectedToken.actor.id}";
-        let textContent = "${messageContent}";
-        let messageDelay = ${messageDelay};
-        let textBox = Theatre.instance.getTextBoxById(theatreId);
-        let insert = Theatre.instance.getInsertById(theatreId);
-        let charSpans = [];
-        // replace newlines
-        textContent = textContent.replace(/<br(| \\/)>/g, "\\n");
-        // convert all html specials to plaintext
-        let txtTemp = document.createElement("hiddentext");
-        txtTemp.innerHTML = textContent;
-        textContent = txtTemp.textContent;
-        if (textBox) {
-            // kill all tweens
-            for (let c of textBox.children) {
-                for (let sc of c.children) TweenMax.killTweensOf(sc);
-                TweenMax.killTweensOf(c);
-            }
-            for (let c of textBox.children) c.parentNode.removeChild(c);
-            TweenMax.killTweensOf(textBox);
-            textBox.style["overflow-y"] = "scroll";
-            textBox.style["overflow-x"] = "hidden";
-            textBox.textContent = "";
-            let insertFlyinMode = insert.textFlyin ?? "typewriter";
-            let insertStandingMode = insert.textStanding ?? null;
-            let insertFontType = insert.textFont ?? null;
-            let insertFontSize = Number(insert.textSize) ?? null;
-            let insertFontColor = insert.textColor ?? null;
-            let fontSize = Number(textBox.getAttribute("osize") || 28);
-            switch (insertFontSize) {
-                case 3:
-                    fontSize *= 1.5;
-                    break;
-                case 1:
-                    fontSize *= 0.5;
-                    break;
-                default:
-                    break;
-            }
-            Theatre.instance._applyFontFamily(textBox, insertFontType || Theatre.instance.textFont);
-            textBox.style.color = insertFontColor || "white";
-            textBox.style["font-size"] = \`\${fontSize}px\`;
-            textBox.scrollTop = 0;
-            charSpans = Theatre.splitTextBoxToChars(textContent, textBox);
-            Theatre.textFlyinAnimation(insertFlyinMode || "typewriter").call(
-                this,
-                charSpans,
-                0.5,
-                0.05,
-                Theatre.textStandingAnimation(insertStandingMode),
-            );
-            if (insert && insert.decayTOId) {
-                window.clearTimeout(insert.decayTOId);
-            }
-            if (insert && Theatre.instance.settings.autoDecay) {
-                insert.decayTOId = window.setTimeout(
-                    (imgId) => {
-                        let insert = Theatre.instance.getInsertById(imgId);
-                        if (insert) Theatre.instance.decayTextBoxById(imgId, true);
-                    },
-                    Math.max(Theatre.instance.settings.decayRate * charSpans.length, Theatre.instance.settings.decayMin),
-                    insert.imgId,
-                );
-            }
-        }
-        //Do the delay here instead of slowing the whole sequence.
-        setTimeout(() => { Theatre.instance.removeInsertById(theatreId) }, (messageDelay));
+
+        const speaker = { alias: "${selectedToken.name}", token: "${selectedToken.id}", actor: "${selectedToken.actor.id}" };
+        const content = "${messageContent}";
+	    const messageDelay = ${messageDelay};
+        ChatMessage.create({ speaker, content });
+       //Do the delay here instead of slowing the whole sequence.
+       setTimeout(() => { Theatre.instance.removeInsertById(\`theatre-\${speaker.actor}\`) }, (messageDelay));
     })
     ${messageWait ? `.wait(${messageDelay + 2000})` : ''}
           `.trim());
