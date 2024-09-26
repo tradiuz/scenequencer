@@ -1,5 +1,5 @@
 /*
-Requires Advanced Macros and the two helper macros for player side UI things (modal and hide UI)
+Requires Advanced Macros, FXMaster, and the two helper macros for player side UI things (modal and hide UI)
 */
 
 let cutsceneActions = [];

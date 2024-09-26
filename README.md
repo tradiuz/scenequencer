@@ -11,7 +11,7 @@ This fork was redone to leverage sequencer to make all actions serialized.
 - **Token Movement**: Animate multiple tokens moving across the map.
 - **Token Visibility**: Show or hide tokens dynamically.
 - **Chat and Dialogues**: Display chat messages or dialogues as part of the cutscene.
-- ~~**Screen Flash**: Add dramatic screen flash effects.~~ (currently broken)
+- **Screen Flash**: Add dramatic screen flash effects.
 - **Screen Shake**: Create intense moments with screen shake effects.
 - **Tile Movement**: Animate the movement of tiles within the scene.
 - **Door State**: Open, close, lock, or unlock doors within the scene.
