@@ -414,7 +414,8 @@ function addScreenFlashAction() {
     .effect()
         .shape("circle",{
             fillColor: "${flashColor}", 
-            fillAlpha:${flashOpacity},
+            fillAlpha: 1,
+            alpha: ${flashOpacity},
             radius: 1
         })
         .screenSpace()
