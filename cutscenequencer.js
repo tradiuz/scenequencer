@@ -29,7 +29,7 @@ function openInitialDialog() {
   <div class="cutscene-maker-buttons">
       <div class="cutscene-maker-button" id="cameraButton">Camera</div>
       <div class="cutscene-maker-button" id="introButton">Boss Intro</div>
-      <div class="cutscene-maker-button" id="sceneButton">Switch Scene ⚠</div>
+
       <div class="cutscene-maker-button" id="showButton">Show Token</div>
       <div class="cutscene-maker-button" id="hideButton">Hide Token</div>
       <div class="cutscene-maker-button" id="movementButton">Token Movement</div>
@@ -42,7 +42,7 @@ function openInitialDialog() {
       <div class="cutscene-maker-button" id="lightButton">Light State</div>
       <div class="cutscene-maker-button" id="ambientButton">Ambient Sound State</div>
       <div class="cutscene-maker-button" id="imageButton">Show Image</div>
-      <div class="cutscene-maker-button" id="animationButton">Play Animation</div>
+      <div class="cutscene-maker-button" id="animationButton">Play Token Animation</div>
       <div class="cutscene-maker-button" id="soundButton">Play Sound</div>
       <div class="cutscene-maker-button" id="playlistButton">Change Playlist</div>
       <div class="cutscene-maker-button" id="fadeoutButton">Fade Out</div>
@@ -53,6 +53,7 @@ function openInitialDialog() {
       <div class="cutscene-maker-button" id="showModalButton">Modal</div>
       <div class="cutscene-maker-button" id="macroButton">Run Macro</div>
       <div class="cutscene-maker-button" id="waitButton">Wait</div>
+      <div class="cutscene-maker-button" id="sceneButton">Switch Scene ⚠</div>
       <div class="cutscene-maker-finish" id="finishButton">Export Macro</div>
   </div>
   `, buttons: {}, render: html => {
@@ -210,23 +211,23 @@ function addTheatreCommandAction() {
     const selectedToken = canvas.tokens.controlled[0];
     new Dialog({
         title: "Theatre Command", content: `
-      <form>
+    <form>
         <div class="form-group">
-          <label for="messageContent">Message:</label>
-          <textArea rows=4 id="messageContent" name="messageContent" style="width: 100%;"></textArea>
+            <label for="messageContent">Message:</label>
+            <textArea rows=4 id="messageContent" name="messageContent" style="width: 100%;"></textArea>
         </div>
         <div class="form-group">
         <label for="messageDelay">Duration (ms):</label>
         <input type="number" id="messageDelay" name="messageDelay"  style="width: 20%;">
         <p style="font-size: 0.8em; margin-top: 5px;">Leave blank for auto-calculated based on message length.</p>
-      </div>
-      <div class="form-group">
+        </div>
+        <div class="form-group">
             <label for="messageWait">Wait for completion:</label>
             <input type="checkbox" id="messageWait" name="messageWait" value="0" style="margin-top: 5px;">
             
-          </div>
-      </form>
-      <p>Enter the message you want the selected token to say in chat. This will be added to your cutscene script.</p>
+        </div>
+    </form>
+    <p>Enter the message you want the selected token to say in chat. This will be added to your cutscene script.</p>
     `, buttons: {
             ok: {
                 label: "Add", callback: html => {
@@ -621,37 +622,81 @@ function addDoorStateAction() {
 function addLightStateAction() {
     new Dialog({
         title: "Light State Action", content: `
-      <form>
-          <div class="form-group">
-              <label for="lightId">Light Source ID:</label>
-              <input type="text" id="lightId" name="lightId" placeholder="Enter light source ID here" style="width: 100%;">
-          </div>
+    <form>
+        <div class="form-group">
+            <label for="lightId">Light Source ID:</label>
+            <input type="text" id="lightId" name="lightId" placeholder="Enter light source ID here" style="width: 100%;">
+        </div>
+
       </form>
       <p>Enter the light source ID and choose to toggle its state in the cutscene.</p>
   `, buttons: {
-            onOff: {
-                label: "On/Off", callback: html => {
+            On: {
+                label: "On", callback: html => {
                     const lightId = html.find("#lightId").val();
                     if (!lightId) {
                         ui.notifications.warn("Please enter a light source ID.");
                         return;
                     }
-                    cutsceneActions.push(`
-                      .thenDo(async function() {
-                          const light = canvas.lighting.get("${lightId}");
-                          if (light) {
-                              const newVisibility = !light.data.hidden;
-                              await light.document.update({hidden: newVisibility});
-                              console.log("Light " + (newVisibility ? "enabled" : "disabled") + ".");
-                          } else {
-                              console.warn("Light source not found with ID: ${lightId}");
-                          }
-                      })
+                    cutsceneActions.push(`//LIGHT - ON
+    .thenDo(async function() {
+        const light = canvas.lighting.get("${lightId}");
+        if (light) {
+            await light.document.update({hidden: false});
+            console.log("Light enabled.");
+        } else {
+            console.warn("Light source not found with ID: ${lightId}");
+        }
+    })
                   `);
                     ui.notifications.info("Light toggle action added to the cutscene script.");
                     openInitialDialog();
                 }
-            }, cancel: { label: "Cancel", callback: () => openInitialDialog() }
+            }, Off: {
+                label: "Off", callback: html => {
+                    const lightId = html.find("#lightId").val();
+                    if (!lightId) {
+                        ui.notifications.warn("Please enter a light source ID.");
+                        return;
+                    }
+                    cutsceneActions.push(`//LIGHT - OFF
+    .thenDo(async function() {
+        const light = canvas.lighting.get("${lightId}");
+        if (light) {
+            await light.document.update({hidden: true});
+            console.log("Light disabled.");
+        } else {
+            console.warn("Light source not found with ID: ${lightId}");
+        }
+    })
+                  `);
+                    ui.notifications.info("Light toggle action added to the cutscene script.");
+                    openInitialDialog();
+                }
+            }, Toggle: {
+                label: "Toggle", callback: html => {
+                    const lightId = html.find("#lightId").val();
+                    if (!lightId) {
+                        ui.notifications.warn("Please enter a light source ID.");
+                        return;
+                    }
+                    cutsceneActions.push(`//LIGHT - TOGGLE
+    .thenDo(async function() {
+        const light = canvas.lighting.get("${lightId}");
+        if (light) {
+            const newVisibility = !light.data.hidden;
+            await light.document.update({hidden: newVisibility});
+            console.log("Light " + (newVisibility ? "enabled" : "disabled") + ".");
+        } else {
+            console.warn("Light source not found with ID: ${lightId}");
+        }
+    })
+                  `);
+                    ui.notifications.info("Light toggle action added to the cutscene script.");
+                    openInitialDialog();
+                }
+            }
+            , cancel: { label: "Cancel", callback: () => openInitialDialog() }
         }
     }).render(true);
 }
