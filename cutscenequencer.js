@@ -30,14 +30,15 @@ function openInitialDialog() {
       <div class="cutscene-maker-button" id="cameraButton">Camera</div>
       <div class="cutscene-maker-button" id="introButton">Boss Intro</div>
 
-      <div class="cutscene-maker-button" id="showButton">Show Token</div>
-      <div class="cutscene-maker-button" id="hideButton">Hide Token</div>
+      <div class="cutscene-maker-button" id="tokenVisibilityButton">Token Visibility</div>
       <div class="cutscene-maker-button" id="movementButton">Token Movement</div>
+      <div class="cutscene-maker-button" id="tileVisibilityButton">Tile Visibility</div>
+      <div class="cutscene-maker-button" id="tileButton">Tile Movement</div>
       <div class="cutscene-maker-button" id="chatButton">Chat</div>
       <div class="cutscene-maker-button" id="theatreButton">Theatre</div>
       <div class="cutscene-maker-button" id="flashButton">Screen Flash</div>
       <div class="cutscene-maker-button" id="shakeButton">Screen Shake</div>
-      <div class="cutscene-maker-button" id="tileButton">Tile Movement</div>
+
       <div class="cutscene-maker-button" id="doorButton">Door State</div>
       <div class="cutscene-maker-button" id="lightButton">Light State</div>
       <div class="cutscene-maker-button" id="ambientButton">Ambient Sound State</div>
@@ -67,8 +68,8 @@ function openInitialDialog() {
             html.find("#chatButton").click(() => closeDialogAndExecute(addChatCommandAction));
             html.find("#theatreButton").click(() => closeDialogAndExecute(addTheatreCommandAction));
             html.find("#movementButton").click(() => closeDialogAndExecute(addTokenMovementAction));
-            html.find("#hideButton").click(() => closeDialogAndExecute(addVisibilityAction(false)));
-            html.find("#showButton").click(() => closeDialogAndExecute(addVisibilityAction(true)));
+            html.find("#tokenVisibilityButton").click(() => closeDialogAndExecute(addTokenVisibilityAction));
+            html.find("#tileVisibilityButton").click(() => closeDialogAndExecute(addTileVisibilityAction));
             html.find("#flashButton").click(() => closeDialogAndExecute(addScreenFlashAction));
             html.find("#shakeButton").click(() => closeDialogAndExecute(addScreenShakeAction));
             html.find("#tileButton").click(() => closeDialogAndExecute(addTileMovementAction));
@@ -314,23 +315,123 @@ function addTokenMovementAction() {
         }, default: "ok"
     }).render(true);
 }
-function addVisibilityAction(visible = true) {
+
+
+
+function addTokenVisibilityAction() {
     if (canvas.tokens.controlled.length < 1) {
         ui.notifications.warn("Please select one or more tokens.");
         openInitialDialog();
         return;
     }
-    const selectedTokens = canvas.tokens.controlled;
-    selectedTokens.map(t => {
-        cutsceneActions.push(`//TOKEN - ${visible ? 'SHOW' : 'HIDE'} - ${t.name}
-    .animation()
-        .on("${t.id}")
-        .show(${visible})
-  `);
-    });
-    ui.notifications.info(`Token ${visible ? 'show' : 'hide'} action added to the cutscene script.`);
-    openInitialDialog();
+    new Dialog({
+        title: "Token Visibility Action", content: `
+          <p>Choose tokens to set their visibility state in the cutscene.</p>
+  `, buttons: {
+            show: {
+                label: "Show", callback: html => {
+                    const selectedTokens = canvas.tokens.controlled;
+                    selectedTokens.map(t => {
+                        cutsceneActions.push(`//TOKEN - SHOW - ${t.name}
+                    .animation()
+                        .on("${t.id}")
+                        .show()
+                  `);
+                    });
+                    ui.notifications.info(`Token show action added to the cutscene script.`);
+                    openInitialDialog();
+                }
+            }, hide: {
+                label: "Hide", callback: html => {
+                    const selectedTokens = canvas.tokens.controlled;
+                    selectedTokens.map(t => {
+                        cutsceneActions.push(`//TOKEN - HIDE - ${t.name}
+                    .animation()
+                        .on("${t.id}")
+                        .hide()
+                  `);
+                    });
+                    ui.notifications.info(`Token hide action added to the cutscene script.`);
+                    openInitialDialog();
+                }
+            },
+            toggle: {
+                label: "Toggle", callback: html => {
+                    const selectedTokens = canvas.tokens.controlled;
+                    selectedTokens.map(t => {
+                        cutsceneActions.push(`//TOKEN - TOGGLE - ${t.name}
+                    .animation()
+                        .on("${t.id}")
+                        .show(canvas.tokens.get("${t.id}").document.hidden)
+                  `);
+                    });
+                    ui.notifications.info(`Token toggle action added to the cutscene script.`);
+                    openInitialDialog();
+                }
+            }
+            , cancel: { label: "Cancel", callback: () => openInitialDialog() }
+        }
+    }).render(true);
 }
+
+
+function addTileVisibilityAction() {
+    if (canvas.tiles.controlled.length < 1) {
+        ui.notifications.warn("Please select one or more tiles.");
+        openInitialDialog();
+        return;
+    }
+    new Dialog({
+        title: "Tile Visibility Action", content: `
+          <p>Choose tiles to set their visibility state in the cutscene.</p>
+  `, buttons: {
+            show: {
+                label: "Show", callback: html => {
+                    const selectedTiles = canvas.tiles.controlled;
+                    selectedTiles.map(t => {
+                        cutsceneActions.push(`//TILE - SHOW - ${t.name}
+                    .animation()
+                        .on("${t.id}")
+                        .show()
+                  `);
+                    });
+                    ui.notifications.info(`Tile show action added to the cutscene script.`);
+                    openInitialDialog();
+                }
+            }, hide: {
+                label: "Hide", callback: html => {
+                    const selectedTiles = canvas.tiles.controlled;
+                    selectedTiles.map(t => {
+                        cutsceneActions.push(`//TILE - HIDE - ${t.name}
+                    .animation()
+                        .on("${t.id}")
+                        .hide()
+                  `);
+                    });
+                    ui.notifications.info(`Tile hide action added to the cutscene script.`);
+                    openInitialDialog();
+                }
+            },
+            toggle: {
+                label: "Toggle", callback: html => {
+                    const selectedTiles = canvas.tiles.controlled;
+                    selectedTiles.map(t => {
+                        cutsceneActions.push(`//TILE - TOGGLE - ${t.name}
+                    .animation()
+                        .on("${t.id}")
+                        .show(canvas.tiles.get("${t.id}").document.hidden)
+                  `);
+                    });
+                    ui.notifications.info(`Tile visibility toggle action added to the cutscene script.`);
+                    openInitialDialog();
+                }
+            }
+            , cancel: { label: "Cancel", callback: () => openInitialDialog() }
+        }
+    }).render(true);
+}
+
+
 function addRunMacroAction() {
     new Dialog({
         title: "Run Macro Action", content: `
@@ -859,9 +960,6 @@ function addAnimationAction() {
         openInitialDialog();
         return;
     }
-    const sourceToken = canvas.tokens.controlled[0];
-    let targetedTokens = Array.from(game.user.targets);
-    let targetToken = targetedTokens.length > 0 ? targetedTokens[0] : null;
     new Dialog({
         title: "Add Animation", content: `
     <form>
@@ -875,28 +973,34 @@ function addAnimationAction() {
       </div>
       <div class="form-group">
         <label for="rotation">Rotation (degrees):</label>
-        <input type="number" id="rotation" name="rotation" value="0" step="1" style="width: 100%;">
+        <input type="number" id="rotation" name="rotation"  step="1" style="width: 100%;">
       </div>
       <div class="form-group">
         <label for="duration">Duration (ms):</label>
-        <input type="number" id="duration" name="duration" value="1000" step="100" min="100" style="width: 100%;">
+        <input type="number" id="duration" name="duration"  step="100" min="100" style="width: 100%;">
       </div>
     </form>
+    <p>If you select one token and target another, it will stretch from the selected token to the target, otherwise</p>
   `, buttons: {
             add: {
-                label: "Add Animation", callback: html => {
+                label: "Add Token Effect", callback: html => {
+                    const sourceToken = canvas.tokens.controlled[0];
+                    let targetedTokens = Array.from(game.user.targets);
+                    let targetToken = targetedTokens.length > 0 ? targetedTokens[0] : null;
                     const animationUrl = html.find("#animationUrl").val();
                     const scale = parseFloat(html.find("#scale").val());
                     const rotation = parseInt(html.find("#rotation").val());
                     const duration = parseInt(html.find("#duration").val());
-                    let sequencerScript = `//TOKEN - ANIMATION`;
-                    if (targetToken) {
-                        sequencerScript += `.effect().file("${animationUrl}").attachTo(canvas.tokens.get("${sourceToken.id}")).stretchTo(canvas.tokens.get("${targetToken.id}"))`;
-                    } else {
-                        sequencerScript += `.effect().file("${animationUrl}").atLocation(canvas.tokens.get("${sourceToken.id}"))`;
-                    }
-                    sequencerScript += `.scale(${scale}).rotate(${rotation}).duration(${duration})`;
-                    cutsceneActions.push(sequencerScript);
+                    cutsceneActions.push(`//TOKEN - ANIMATION
+    .effect()
+        .file("${animationUrl}")
+        ${targetToken ? `.attachTo(canvas.tokens.get("${sourceToken.id}"))
+        .stretchTo(canvas.tokens.get("${targetToken.id}"))` :
+                            `.atLocation(canvas.tokens.get("${sourceToken.id}"))`}
+        .scale(${scale})
+        ${rotation ? `.rotate(${rotation})` : null}
+        ${duration ? `.duration(${duration})` : null}
+                    `);
                     ui.notifications.info("Animation action added to the cutscene script.");
                     openInitialDialog();
                 }
@@ -1072,8 +1176,6 @@ ${cutsceneActions.join("\n\n")}
             edit: {
                 label: "Edit",
                 callback: html => {
-                    //const updatedScript = html.find("#cutsceneScriptOutput").val();
-                    //cutsceneActions = updatedScript.split("\n\n").filter(action => action.trim() !== "");
                     openInitialDialog();
                 }
             },
@@ -1091,4 +1193,7 @@ ${cutsceneActions.join("\n\n")}
         }
     }).render(true);
 }
+
+
+
 openInitialDialog();
