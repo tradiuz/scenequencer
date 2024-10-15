@@ -6,58 +6,57 @@ let cutsceneActions = [];
 function openInitialDialog() {
     let d = new Dialog({
         title: "Cutscene Macro Maker", content: `
-  <style>
-      .cutscene-maker-buttons {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 10px;
-      }
-      .cutscene-maker-button {
-          text-align: center;
-          padding: 5px;
-          border: 1px solid #ccc;
-          cursor: pointer;
-      }
-      .cutscene-maker-finish {
-          grid-column: 1 / -1; 
-          text-align: center;
-          padding: 5px;
-          border: 1px solid #ccc;
-          cursor: pointer;
-      }
-  </style>
-  <div class="cutscene-maker-buttons">
-      <div class="cutscene-maker-button" id="cameraButton">Camera</div>
-      <div class="cutscene-maker-button" id="introButton">Boss Intro</div>
+<style>
+    .cutscene-maker-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .cutscene-maker-button {
+        text-align: center;
+        padding: 5px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+    }
+    .cutscene-maker-finish {
+        grid-column: 1 / -1; 
+        text-align: center;
+        padding: 5px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+    }
+</style>
+<div class="cutscene-maker-buttons">
+    <div class="cutscene-maker-button" id="cameraButton">Camera</div>
+    <div class="cutscene-maker-button" id="introButton">Boss Intro</div>
 
-      <div class="cutscene-maker-button" id="tokenVisibilityButton">Token Visibility</div>
-      <div class="cutscene-maker-button" id="movementButton">Token Movement</div>
-      <div class="cutscene-maker-button" id="tileVisibilityButton">Tile Visibility</div>
-      <div class="cutscene-maker-button" id="tileButton">Tile Movement</div>
-      <div class="cutscene-maker-button" id="chatButton">Chat</div>
-      <div class="cutscene-maker-button" id="theatreButton">Theatre</div>
-      <div class="cutscene-maker-button" id="flashButton">Screen Flash</div>
-      <div class="cutscene-maker-button" id="shakeButton">Screen Shake</div>
+    <div class="cutscene-maker-button" id="tokenVisibilityButton">Token Visibility</div>
+    <div class="cutscene-maker-button" id="movementButton">Token Movement</div>
+    <div class="cutscene-maker-button" id="tileVisibilityButton">Tile Visibility</div>
+    <div class="cutscene-maker-button" id="tileButton">Tile Movement</div>
+    <div class="cutscene-maker-button" id="chatButton">Chat</div>
+    <div class="cutscene-maker-button" id="theatreButton">Theatre</div>
+    <div class="cutscene-maker-button" id="flashButton">Screen Flash</div>
+    <div class="cutscene-maker-button" id="shakeButton">Screen Shake</div>
 
-      <div class="cutscene-maker-button" id="doorButton">Door State</div>
-      <div class="cutscene-maker-button" id="lightButton">Light State</div>
-      <div class="cutscene-maker-button" id="ambientButton">Ambient Sound State</div>
-      <div class="cutscene-maker-button" id="imageButton">Show Image</div>
-      <div class="cutscene-maker-button" id="animationButton">Play Token Animation</div>
-      <div class="cutscene-maker-button" id="soundButton">Play Sound</div>
-      <div class="cutscene-maker-button" id="playlistButton">Change Playlist</div>
-      <div class="cutscene-maker-button" id="fadeoutButton">Fade Out</div>
-      <div class="cutscene-maker-button" id="fadeinButton">Fade In</div>
-      <div class="cutscene-maker-button" id="hideUIButton">Hide UI</div>
-      <div class="cutscene-maker-button" id="showUIButton">Show UI</div>
-      <div class="cutscene-maker-button" id="effectsButton">Weather/Particle Effects</div>
-      <div class="cutscene-maker-button" id="showModalButton">Modal</div>
-      <div class="cutscene-maker-button" id="macroButton">Run Macro</div>
-      <div class="cutscene-maker-button" id="waitButton">Wait</div>
-      <div class="cutscene-maker-button" id="sceneButton">Switch Scene ⚠</div>
-      <div class="cutscene-maker-finish" id="finishButton">Export Macro</div>
-  </div>
-  `, buttons: {}, render: html => {
+    <div class="cutscene-maker-button" id="doorButton">Door State</div>
+    <div class="cutscene-maker-button" id="lightButton">Light State</div>
+    <div class="cutscene-maker-button" id="ambientButton">Ambient Sound State</div>
+    <div class="cutscene-maker-button" id="imageButton">Show Image</div>
+    <div class="cutscene-maker-button" id="animationButton">Play Token Animation</div>
+    <div class="cutscene-maker-button" id="soundButton">Play Sound</div>
+    <div class="cutscene-maker-button" id="playlistButton">Change Playlist</div>
+    
+    <div class="cutscene-maker-button" id="fadeCanvasButton">Fade Canvas</div>
+    <div class="cutscene-maker-button" id="uiVisibilityButton">UI Visibility</div>
+    <div class="cutscene-maker-button" id="effectsButton">Weather/Particle Effects</div>
+    <div class="cutscene-maker-button" id="showModalButton">Modal</div>
+    <div class="cutscene-maker-button" id="macroButton">Run Macro</div>
+    <div class="cutscene-maker-button" id="waitButton">Wait</div>
+    <div class="cutscene-maker-button" id="sceneButton">Switch Scene ⚠</div>
+    <div class="cutscene-maker-finish" id="finishButton">Export Macro</div>
+</div>
+`, buttons: {}, render: html => {
             const closeDialogAndExecute = actionFunction => {
                 d.close();
                 actionFunction();
@@ -83,10 +82,12 @@ function openInitialDialog() {
             html.find("#animationButton").click(() => closeDialogAndExecute(addAnimationAction));
             html.find("#soundButton").click(() => closeDialogAndExecute(addPlaySoundAction));
             html.find("#playlistButton").click(() => closeDialogAndExecute(addPlayPlaylistAction));
-            html.find("#fadeoutButton").click(() => closeDialogAndExecute(addFadeAction(0)));
-            html.find("#fadeinButton").click(() => closeDialogAndExecute(addFadeAction(1)));
-            html.find("#hideUIButton").click(() => closeDialogAndExecute(addUIAction(0)));
-            html.find("#showUIButton").click(() => closeDialogAndExecute(addUIAction(1)));
+            //html.find("#fadeoutButton").click(() => closeDialogAndExecute(addFadeAction(0)));
+            html.find("#fadeCanvasButton").click(() => closeDialogAndExecute(addCanvasFadeAction));
+            //html.find("#fadeinButton").click(() => closeDialogAndExecute(addFadeAction(1)));
+            //html.find("#hideUIButton").click(() => closeDialogAndExecute(addUIAction(0)));
+            //html.find("#showUIButton").click(() => closeDialogAndExecute(addUIAction(1)));
+            html.find("#uiVisibilityButton").click(() => closeDialogAndExecute(addUIAction));
             html.find("#showModalButton").click(() => closeDialogAndExecute(addShowModalAction));
             html.find("#finishButton").click(() => closeDialogAndExecute(outputCutsceneScript));
         }
@@ -96,17 +97,17 @@ function openInitialDialog() {
 function addCameraPositionAction() {
     new Dialog({
         title: "Camera Position Action", content: `
-      <form>
-        <div class="form-group">
-          <label for="panDuration">Pan Duration (ms):</label>
-          <input type="number" id="panDuration" name="panDuration" value="1000" step="100" style="width: 100%;">
-        </div>
-        <div class="form-group">
-          <label for="lockDuration">Lock Duration (ms):</label>
-          <input type="number" id="lockDuration" name="lockDuration" value="1000" step="100" style="width: 100%;">
-        </div>
-      </form>
-      <p>Current position and zoom level will be used.</p>
+    <form>
+    <div class="form-group">
+        <label for="panDuration">Pan Duration (ms):</label>
+        <input type="number" id="panDuration" name="panDuration" value="1000" step="100" style="width: 100%;">
+    </div>
+    <div class="form-group">
+        <label for="lockDuration">Lock Duration (ms):</label>
+        <input type="number" id="lockDuration" name="lockDuration" value="1000" step="100" style="width: 100%;">
+    </div>
+    </form>
+    <p>Current position and zoom level will be used.</p>
     `, buttons: {
             ok: {
                 label: "Add", callback: html => {
@@ -120,7 +121,7 @@ function addCameraPositionAction() {
         .scale(${viewPosition.scale})
         .lockView(${lockDuration})
         .waitUntilFinished()
-          `.trim());
+        `.trim());
                     ui.notifications.info("Camera position action added to the cutscene.");
                     openInitialDialog();
                 }
@@ -131,19 +132,19 @@ function addCameraPositionAction() {
 function addSwitchSceneAction() {
     new Dialog({
         title: "Switch Scene", content: `
-      <form>
+    <form>
         <div class="form-group">
-          <label for="sceneId">Scene ID:</label>
-          <input type="text" id="sceneId" name="sceneId" placeholder="Enter the scene ID here" style="width: 100%;">
-          <p>Enter the ID of the scene you wish to switch to.</p>
+            <label for="sceneId">Scene ID:</label>
+            <input type="text" id="sceneId" name="sceneId" placeholder="Enter the scene ID here" style="width: 100%;">
+            <p>Enter the ID of the scene you wish to switch to.</p>
         </div>
         <div class="form-group">
             <label for="sceneActivate">Activate:</label>
             <input type="checkbox" id="sceneActivate" name="sceneActivate" style="margin-top: 5px;">
         <p style="font-size: 0.8em; margin-top: 5px;">Activate instead of just changing the scene.</p>
-      </div>
-      </form>
-      <p><strong>This currently will break flows!<strong></p>
+        </div>
+        </form>
+    <p><strong>This currently will break flows!<strong></p>
     `, buttons: {
             add: {
                 label: "Add Scene Switch", callback: html => {
@@ -176,24 +177,24 @@ function addChatCommandAction() {
     const selectedToken = canvas.tokens.controlled[0];
     new Dialog({
         title: "Chat Command", content: `
-      <form>
-        <div class="form-group">
-          <label for="messageContent">Message:</label>
-          <input type="text" id="messageContent" name="messageContent" style="width: 100%;">
-        </div>
-      </form>
-      <p>Enter the message you want the selected token to say in chat. This will be added to your cutscene script.</p>
-    `, buttons: {
+        <form>
+            <div class="form-group">
+            <label for="messageContent">Message:</label>
+            <input type="text" id="messageContent" name="messageContent" style="width: 100%;">
+            </div>
+        </form>
+        <p>Enter the message you want the selected token to say in chat. This will be added to your cutscene script.</p>
+        `, buttons: {
             ok: {
                 label: "Add", callback: html => {
                     const messageContent = html.find("#messageContent").val();
                     cutsceneActions.push(`//CHAT
-    .thenDo(async function() {
-              const speaker = { alias: "${selectedToken.name}", token: "${selectedToken.id}", actor: "${selectedToken.actor.id}" };
-              const content = "${messageContent.replace(/"/g, '\\"')}";
-              ChatMessage.create({ speaker, content });
-            })
-          `.trim());
+    .thenDo(async function() {  
+        const speaker = { alias: "${selectedToken.name}", token: "${selectedToken.id}", actor: "${selectedToken.actor.id}" };
+        const content = "${messageContent.replace(/"/g, '\\"')}";
+        ChatMessage.create({ speaker, content });
+    })
+        `.trim());
                     ui.notifications.info("Chat command action added to the cutscene script.");
                     openInitialDialog();
                 }
@@ -1075,6 +1076,7 @@ function addPlayPlaylistAction() {
         }, default: "add"
     }).render(true);
 }
+/*
 function addFadeAction(brightness) {
     cutsceneActions.push(`//FADE ${brightness ? "IN" : "OUT"}
     .thenDo(async function(){
@@ -1082,21 +1084,66 @@ function addFadeAction(brightness) {
     })`);
     ui.notifications.info("Fade-in effect added to the cutscene script.");
     openInitialDialog();
-}
-function addUIAction(opacity) {
+}*/
+
+function addCanvasFadeAction() {
     new Dialog({
-        title: `${opacity ? "Show" : "Hide"} UI Settings`, content: `
+        title: "Canvas Fade Action",
+        content: `<form>
+        <div class="form-group">
+        <label for="fadeWait">Wait until finished (6s):</label>
+        <input type="checkbox" id="fadeWait" name="fadeWait" style="margin-top: 5px;">
+    </div>
+    <div class="form-group">
+    <label for="showHide">Fade In</label>
+    <input type="radio" id="show" name="showHide" style="margin-top: 5px;" checked value=1 >
+    <label for="showHide">Fade Out</label>
+    <input type="radio" id="hide" name="showHide" style="margin-top: 5px;" value=0 >
+</div>
+</form>
+<p></p>`,
+        buttons: {
+            ok: {
+                label: "OK",
+                callback: html => {
+                    const fadeWait = html.find("#fadeWait")[0].checked;
+                    const opacity = new FormDataExtended(html[0].querySelector("form")).object.showHide;
+                    cutsceneActions.push(`//FADE ${opacity ? `IN` : `OUT`}
+    .thenDo(async function(){
+        FXMASTER.filters.addFilter("cs-fade", "color", {color: {apply: false },brightness: ${opacity}});
+    })
+    ${fadeWait ? '.wait(6000)' : ''}`);
+                    ui.notifications.info("Fade-in effect added to the cutscene script.");
+                    openInitialDialog();
+                }
+            },
+            cancel: { label: "Cancel", callback: () => openInitialDialog() }
+        },
+        default: "ok"
+    }).render(true);
+}
+
+function addUIAction() {
+    new Dialog({
+        title: `UI Visibility Settings`, content: `
         <form>
             <div class="form-group">
                 <label for="duration">Transition Duration (in milliseconds):</label>
                 <input type="number" id="duration" name="duration" value="500" step="100" style="width: 100%;">
             </div>
+            <div class="form-group">
+                <label for="showHide">Show</label>
+                <input type="radio" id="show" name="showHide" style="margin-top: 5px;" checked value=1 >
+                <label for="showHide">Hide</label>
+                <input type="radio" id="hide" name="showHide" style="margin-top: 5px;" value=0 >
+            </div>
         </form>
-        <p>The UI will ${opacity ? "appear" : "disappear"} over the specified duration.</p>
+        <p>The UI will either  over the specified duration.</p>
     `, buttons: {
             ok: {
                 label: "Add", callback: html => {
                     const duration = html.find("#duration").val();
+                    const opacity = new FormDataExtended(html[0].querySelector("form")).object.showHide;
                     cutsceneActions.push(`// UI - ${opacity ? `SHOW` : `HIDE`}
     .macro("modify-ui",{opacity: '${opacity}', duration: ${duration}})
     .wait(${duration})`);
