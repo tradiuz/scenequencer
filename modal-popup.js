@@ -15,9 +15,8 @@ modal.style.top = modalPicture ? '70%' : '30%';
 modal.style.left = '50%';
 modal.style.marginInline = 'auto';
 modal.style.transform = 'translate(-50%, -50%)';
-modal.style.minWidth = '500px';
-modal.style.maxWidth = '70%';
-modal.style.minHeight = '100px';
+modal.style.width = '60%';
+modal.style.minHeight = '10%';
 modal.style.padding = '10px';
 modal.style.columnGap = '10px';
 modal.style.zIndex = 100;
@@ -33,7 +32,7 @@ modal.style.opacity = 0;
 modal.style.transition = 'opacity 1s';
 modal.style.fontFamily = 'Courier New';
 modal.style.color = 'var(--primary-color)';
-modal.innerHTML = `${modalPicture ? `<div  style="grid-area: 1 / 1 /span 2 / span 1;"><img src="${modalPicture}" style="border-radius: 5px" ></div>` : ''}
+modal.innerHTML = `${modalPicture ? `<div  style="grid-area: 1 / 1 /span 2 / span 1;"><img src="${modalPicture}" style="border-radius: 5px; border: 0" ></div>` : ''}
 <div><h2 style="font-family: 'Bruno Ace'; text-align: center">${modalTitle}</h2></div>
 <div><p>${modalBody}</p></div>`;
 
