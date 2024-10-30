@@ -106,6 +106,7 @@ function addCameraPositionAction() {
         <label for="lockDuration">Lock Duration (ms):</label>
         <input type="number" id="lockDuration" name="lockDuration" value="1000" step="100" style="width: 100%;">
     </div>
+    ${waitUntilFinishedHtml()}
     </form>
     <p>Current position and zoom level will be used.</p>
     `, buttons: {
@@ -114,13 +115,14 @@ function addCameraPositionAction() {
                     const duration = html.find("#panDuration").val();
                     const lockDuration = html.find("#lockDuration").val();
                     const viewPosition = canvas.scene._viewPosition;
+                    const waitUntilFinished = html.find("#waitUntilFinished")[0].checked;
                     cutsceneActions.push(`//CAMERA
     .canvasPan()
         .atLocation({x: ${viewPosition.x}, y: ${viewPosition.y}})
         .duration(${duration})
         .scale(${viewPosition.scale})
         .lockView(${lockDuration})
-        .waitUntilFinished()
+        ${waitUntilFinished ? `.waitUntilFinished()` : ''}
         `.trim());
                     ui.notifications.info("Camera position action added to the cutscene.");
                     openInitialDialog();
@@ -501,10 +503,7 @@ function addScreenFlashAction() {
         <label for="flashDuration">Duration (milliseconds):</label>
         <input type="number" id="flashDuration" name="flashDuration" step="100" min="100" value="3000" style="width: 100%;">
       </div>
-      <div class="form-group">
-        <label for="flashWait">Wait for Flash:</label>
-        <input type="checkbox" id="flashWait" name="flashWait" value="0" style="margin-top: 5px;">
-      </div>
+      ${waitUntilFinishedHtml()}
     </form>
   `, buttons: {
             add: {
@@ -512,7 +511,7 @@ function addScreenFlashAction() {
                     const flashColor = html.find("#flashColor").val();
                     const flashOpacity = parseFloat(html.find("#flashOpacity").val());
                     const flashDuration = parseInt(html.find("#flashDuration").val());
-                    const flashWait = html.find("#flashWait")[0].checked;
+                    const waitUntilFinished = html.find("#waitUntilFinished")[0].checked;
                     cutsceneActions.push(`//SCREEN - FLASH
     .effect()
         .shape("circle",{
@@ -527,8 +526,7 @@ function addScreenFlashAction() {
         .fadeIn(100)
         .duration(${flashDuration})
         .fadeOut(${flashDuration / 2})
-        ${flashWait ? `.waitUntilFinished()` : ""}
-                    `);
+        ${waitUntilFinished ? `.waitUntilFinished()` : ''}`);
                     ui.notifications.info("Screen flash effect added to the cutscene script.");
                     openInitialDialog();
                 }
@@ -552,10 +550,7 @@ function addScreenShakeAction() {
           <label for="shakeIntensity">Intensity:</label>
           <input type="number" id="shakeIntensity" name="shakeIntensity" value="10" step="1" min="1" style="width: 100%;">
         </div>
-        <div class="form-group">
-        <label for="shakeWait">Wait for Flash:</label>
-        <input type="checkbox" id="shakeWait" name="shakeWait" value="0" style="margin-top: 5px;">
-      </div>
+        ${waitUntilFinishedHtml()}
       </form>
     `, buttons: {
             add: {
@@ -563,7 +558,7 @@ function addScreenShakeAction() {
                     const shakeDuration = parseInt(html.find("#shakeDuration").val());
                     const shakeFrequency = parseInt(html.find("#shakeFrequency").val());
                     const shakeIntensity = parseInt(html.find("#shakeIntensity").val());
-                    const shakeWait = html.find("#shakeWait")[0].checked;
+                    const waitUntilFinished = html.find("#waitUntilFinished")[0].checked;
                     cutsceneActions.push(`//SCREEN - SHAKE
     .canvasPan()
         .shake({
@@ -571,8 +566,7 @@ function addScreenShakeAction() {
             strength: ${shakeIntensity},
             frequency: ${shakeFrequency}
         })
-        ${shakeWait ? '.waitUntilFinished()' : ''}      
-            `);
+        ${waitUntilFinished ? `.waitUntilFinished()` : ''}`);
                     ui.notifications.info("Screen shake effect added to the cutscene script.");
                     openInitialDialog();
                 }
@@ -1155,32 +1149,41 @@ function addUIAction() {
     }).render(true);
 }
 function addShowModalAction() {
+    const selectedToken = canvas?.tokens?.controlled[0];
+
     new Dialog({
         title: "Modal Action", content: `
       <form>
         <div class="form-group">
-          <label for="modalHeader">Title:</label>
-          <input type="text" id="modalHeader" name="modalHeader" style="width: 100%;">
+          <label for="modalHeader">Title/Person:</label>
+          <input type="text" id="modalHeader" name="modalHeader" style="width: 100%;" value="${selectedToken ? selectedToken?.document?.name : ''}">
         </div>
         <div class="form-group">
-          <label for="modalDescription">Description:</label>
+          <label for="modalDescription">Description/Text:</label>
           <textarea id="modalDescription" name="modalDescription" rows="4" style="width: 100%;"></textarea>
         </div>
         <div class="form-group">
           <label for="modalDuration">Duration (ms):</label>
           <input type="number" id="modalDuration" name="modalDuration" style="width: 100%;" value=5000 step=100>
         </div>
+        <div class="form-group">
+          <label for="modalPicture">Picture:</label>
+          <input type="text" id="modalPicture" name="modalPicture" style="width: 100%;" value="${selectedToken ? Actor.get(selectedToken?.document?.actorId)?.img : ''}">
+        </div>
+        ${waitUntilFinishedHtml()}
       </form>
+      <p>This can be used for a modal popup, or a speech insert. Leave the picture blank for a modal popup.</p>
     `, buttons: {
             ok: {
                 label: "Add", callback: html => {
-                    modalHeader = html.find("#modalHeader").val();
-                    description = html.find("#modalDescription").val();
-                    duration = html.find("#modalDuration").val();
-                    imageUrl = "modules/scenequencer/assets/banner.webp";
+                    const modalHeader = html.find("#modalHeader").val();
+                    const description = html.find("#modalDescription").val().replace(/\n/g, '<br>');
+                    const duration = html.find("#modalDuration").val();
+                    const modalPicture = html.find("#modalPicture").val() ?? '';
+                    const waitUntilFinished = html.find("#waitUntilFinished")[0].checked;
                     cutsceneActions.push(`// MODAL
-    .macro("modal-popup",{title: '${modalHeader}', body: '${description}', duration: '${duration}'})
-    .wait(${duration})
+    .macro("modal-popup",{title: \`${modalHeader}\`, body: \`${description}\`, duration: '${duration}' ${modalPicture ? `, picture: '${modalPicture}'` : ''}})
+    ${waitUntilFinished ? `.wait(${duration})` : ''}
                     `);
                     ui.notifications.info("Room Key added to the cutscene script.");
                     openInitialDialog();
@@ -1244,3 +1247,17 @@ ${cutsceneActions.join("\n\n")}
 
 
 openInitialDialog();
+
+const escapeQuotes = unsafe => {
+    return unsafe
+        .replace(/"/g, '\'\'')
+        ;
+};
+
+function waitUntilFinishedHtml() {
+    return `<div class="form-group">
+    <label for="waitUntilFinished">Wait for Completion:</label>
+    <input type="checkbox" id="waitUntilFinished" name="waitUntilFinished" style="margin-top: 5px;">
+</div>
+`;
+}
