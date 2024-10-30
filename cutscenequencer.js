@@ -1149,14 +1149,15 @@ function addUIAction() {
     }).render(true);
 }
 function addShowModalAction() {
-    const selectedToken = canvas?.tokens?.controlled[0];
-
+    const selectedToken = canvas?.tokens?.controlled[0]?.document;
+    const portrait = (Actor.get(selectedToken?.actorId)?.system?.pilot?.value?.img ?? Actor.get(selectedToken?.actorId)?.img) ?? '';
+    const name = (Actor.get(selectedToken?.actorId)?.system?.pilot?.value?.name ?? Actor.get(selectedToken?.actorId)?.name) ?? '';
     new Dialog({
         title: "Modal Action", content: `
       <form>
         <div class="form-group">
           <label for="modalHeader">Title/Person:</label>
-          <input type="text" id="modalHeader" name="modalHeader" style="width: 100%;" value="${selectedToken ? selectedToken?.document?.name : ''}">
+          <input type="text" id="modalHeader" name="modalHeader" style="width: 100%;" value="${name}">
         </div>
         <div class="form-group">
           <label for="modalDescription">Description/Text:</label>
@@ -1168,7 +1169,7 @@ function addShowModalAction() {
         </div>
         <div class="form-group">
           <label for="modalPicture">Picture:</label>
-          <input type="text" id="modalPicture" name="modalPicture" style="width: 100%;" value="${selectedToken ? Actor.get(selectedToken?.document?.actorId)?.img : ''}">
+          <input type="text" id="modalPicture" name="modalPicture" style="width: 100%;" value="${portrait}">
         </div>
         ${waitUntilFinishedHtml()}
       </form>
