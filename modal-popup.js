@@ -3,37 +3,45 @@ Name this macro modal-popup
 Requires Advanced Macros
 Set to execute as Everyone and give players limited permissions
 */
-const modalTitle = scope.title ?? "Title";
-const modalBody = scope.body ?? "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-const duration = scope.duration ?? 5000;
 
-let header = document.createElement('dialog');
-header.style.position = 'fixed';
-header.style.top = '30%';
-header.style.left = '50%';
-header.style.transform = 'translate(-50%, -50%)';
-header.style.minWidth = '400px';
-header.style.padding = '10px';
-header.style.zIndex = 100;
-header.style.borderRadius = '30px';
-header.style.border = 'thick double var(--primary-color)';
-header.style.background = 'rgba(0,0,0,.9)';
-header.style.display = 'flex';
-header.style.flexDirection = 'column';
-header.style.justifyContent = 'flex-start';
-header.style.alignItems = 'center';
-header.style.fontSize = '2em';
-header.style.opacity = 0;
-header.style.transition = 'opacity 1s';
-header.style.fontFamily = 'Courier New';
-header.style.color = 'var(--primary-color)';
-header.innerHTML = `<h2 style="font-family: 'Bruno Ace'">${modalTitle}</h2><p>${modalBody}</p>`;
+const modalTitle = scope.title ?? "";
+const modalBody = scope.body ?? "";
+const duration = scope.duration ?? 0;
+const modalPicture = scope.picture ?? '';
 
-document.body.appendChild(header);
+let modal = document.createElement('dialog');
+modal.style.position = 'fixed';
+modal.style.top = modalPicture ? '70%' : '30%';
+modal.style.left = '50%';
+modal.style.marginInline = 'auto';
+modal.style.transform = 'translate(-50%, -50%)';
+modal.style.minWidth = '500px';
+modal.style.maxWidth = '70%';
+modal.style.minHeight = '100px';
+modal.style.padding = '10px';
+modal.style.columnGap = '10px';
+modal.style.zIndex = 100;
+modal.style.borderRadius = '10px';
+modal.style.border = 'thick double var(--primary-color)';
+modal.style.background = 'rgba(0,0,0,.9)';
+modal.style.display = 'grid';
+modal.style.grid = `${modalPicture ? '3em / 25%' : ''}auto`;
+modal.style.gridAutoRows = 'max-content';
+modal.style.alignItems = 'center';
+modal.style.fontSize = '2em';
+modal.style.opacity = 0;
+modal.style.transition = 'opacity 1s';
+modal.style.fontFamily = 'Courier New';
+modal.style.color = 'var(--primary-color)';
+modal.innerHTML = `${modalPicture ? `<div  style="grid-area: 1 / 1 /span 2 / span 1;"><img src="${modalPicture}" style="border-radius: 5px" ></div>` : ''}
+<div><h2 style="font-family: 'Bruno Ace'; text-align: center">${modalTitle}</h2></div>
+<div><p>${modalBody}</p></div>`;
 
-setTimeout(() => header.style.opacity = 1, 100);
+document.body.appendChild(modal);
+console.log(modal);
+setTimeout(() => modal.style.opacity = 1, 100);
 
 setTimeout(() => {
-    header.style.opacity = 0;
-    setTimeout(() => header.remove(), duration / 10);
+    modal.style.opacity = 0;
+    setTimeout(() => modal.remove(), duration / 10);
 }, duration);
