@@ -1151,7 +1151,7 @@ function addUIAction() {
 function addShowModalAction() {
     const selectedToken = canvas?.tokens?.controlled[0]?.document;
     const portrait = (Actor.get(selectedToken?.actorId)?.system?.pilot?.value?.img ?? Actor.get(selectedToken?.actorId)?.img) ?? '';
-    const name = (Actor.get(selectedToken?.actorId)?.system?.pilot?.value?.name ?? Actor.get(selectedToken?.actorId)?.name) ?? '';
+    const name = (Actor.get(selectedToken?.actorId)?.system?.pilot?.value?.name ?? selectedToken?.name) ?? '';
     new Dialog({
         title: "Modal Action", content: `
       <form>
@@ -1258,7 +1258,7 @@ const escapeQuotes = unsafe => {
 function waitUntilFinishedHtml() {
     return `<div class="form-group">
     <label for="waitUntilFinished">Wait for Completion:</label>
-    <input type="checkbox" id="waitUntilFinished" name="waitUntilFinished" style="margin-top: 5px;">
+    <input type="checkbox" id="waitUntilFinished" name="waitUntilFinished" style="margin-top: 5px;" checked>
 </div>
 `;
 }
