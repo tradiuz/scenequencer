@@ -106,7 +106,7 @@ function addCameraPositionAction() {
         <label for="lockDuration">Lock Duration (ms):</label>
         <input type="number" id="lockDuration" name="lockDuration" value="1000" step="100" style="width: 100%;">
     </div>
-    ${waitUntilFinishedHtml()}
+    ${waitUntilFinishedHtml}
     </form>
     <p>Current position and zoom level will be used.</p>
     `, buttons: {
@@ -389,14 +389,13 @@ function addTileVisibilityAction() {
           <p>Choose tiles to set their visibility state in the cutscene.</p>
   `, buttons: {
             show: {
-                label: "Show", callback: html => {
+                label: "Show", callback: () => {
                     const selectedTiles = canvas.tiles.controlled;
                     selectedTiles.map(t => {
-                        cutsceneActions.push(`//TILE - SHOW - ${t.name}
-                    .animation()
-                        .on("${t.id}")
-                        .show()
-                  `);
+                        cutsceneActions.push(`//TILE - SHOW
+    .animation()
+        .on("${t.id}")
+        .show()`);
                     });
                     ui.notifications.info(`Tile show action added to the cutscene script.`);
                     openInitialDialog();
@@ -405,11 +404,10 @@ function addTileVisibilityAction() {
                 label: "Hide", callback: html => {
                     const selectedTiles = canvas.tiles.controlled;
                     selectedTiles.map(t => {
-                        cutsceneActions.push(`//TILE - HIDE - ${t.name}
-                    .animation()
-                        .on("${t.id}")
-                        .hide()
-                  `);
+                        cutsceneActions.push(`//TILE - HIDE
+    .animation()
+        .on("${t.id}")
+        .hide()`);
                     });
                     ui.notifications.info(`Tile hide action added to the cutscene script.`);
                     openInitialDialog();
@@ -419,11 +417,10 @@ function addTileVisibilityAction() {
                 label: "Toggle", callback: html => {
                     const selectedTiles = canvas.tiles.controlled;
                     selectedTiles.map(t => {
-                        cutsceneActions.push(`//TILE - TOGGLE - ${t.name}
-                    .animation()
-                        .on("${t.id}")
-                        .show(canvas.tiles.get("${t.id}").document.hidden)
-                  `);
+                        cutsceneActions.push(`//TILE - TOGGLE
+    .animation()
+        .on("${t.id}")
+        .show(canvas.tiles.get("${t.id}").document.hidden)`);
                     });
                     ui.notifications.info(`Tile visibility toggle action added to the cutscene script.`);
                     openInitialDialog();
@@ -503,7 +500,7 @@ function addScreenFlashAction() {
         <label for="flashDuration">Duration (milliseconds):</label>
         <input type="number" id="flashDuration" name="flashDuration" step="100" min="100" value="3000" style="width: 100%;">
       </div>
-      ${waitUntilFinishedHtml()}
+      ${waitUntilFinishedHtml}
     </form>
   `, buttons: {
             add: {
@@ -550,7 +547,7 @@ function addScreenShakeAction() {
           <label for="shakeIntensity">Intensity:</label>
           <input type="number" id="shakeIntensity" name="shakeIntensity" value="10" step="1" min="1" style="width: 100%;">
         </div>
-        ${waitUntilFinishedHtml()}
+        ${waitUntilFinishedHtml}
       </form>
     `, buttons: {
             add: {
@@ -903,13 +900,83 @@ function addImageDisplayAction() {
                     <label for="imageUrl">Image URL:</label>
                     <input type="text" id="imageUrl" name="imageUrl" placeholder="https://picsum.photos/400" style="width: 100%;">
                 </div>
+                <div class="form-group" >
+               <div >     <label for="fadeIn" >Fade In (ms):</label>
+                    <input type="number" id="fadeIn" name="fadeIn" value="0" style="width: 50%;" >
+               </div><div >
+                    <label for="fadeOut">Fade Out (ms):</label>
+                    <input type="number" id="fadeOut" name="fadeOut" value="0" style="width: 50%;">
+                    </div>
+                </div>
+        <div class="form-group">
+            <div>
+                <label for="scale">Duration (ms):</label>
+                <input type="number" id="duration" name="duration" value="10000" step="100" min="0" style="width: 50%;">
+            </div>
+            <div>
+                <label for="scale">Slide Duration (ms):</label>
+                <input type="number" id="slideDuration" name="slideDuration" value="0" step="100" min="0" style="width: 50%;">
+            </div>
+        </div>
+            <div class="form-group" >
+            <div>
+                <label for="startX">Start X:</label>
+                <input type="number" id="startX" name="startX" value="0" style="width: 50%;">
+            </div>
+            <div>
+                <label for="startX">End X:</label>
+                <input type="number" id="endX" name="endX" value="0" style="width: 50%;">
+            </div>
+            <div>
+                <label for="startY">Start Y:</label>
+                <input type="number" id="startY" name="startY" value="0" style="width: 50%;">
+            </div>
+            <div>
+                <label for="startY">End Y:</label>
+                <input type="number" id="endY" name="endY" value="0" style="width: 50%;">
+            </div>    
+        </div>
+        <small><p>0 is "center", and X and Y are offsets from there.</p></small>
+        <div class="form-group">
+            <label for="easeMode">Easing mode:</label>
+            <select name="easeMode" id="easeMode">
+             <option value="" selected>None</option>
+             <option value="Sine">Sine</option>
+             <option value="Cubic">Cubic</option>
+             <option value="Quint">Quint</option>
+             <option value="Circ">Circ</option>
+             <option value="Quad">Quad</option>
+             <option value="Quart">Quart</option>
+             <option value="Expo">Expo</option>
+             <option value="Back">Back</option>
+             <option value="Bounce">Bounce</option>
+            </select>
+        </div
+            ${waitUntilFinishedHtml}
             </form>
         `, buttons: {
                 submit: {
                     label: "Submit", callback: html => {
                         const imageUrl = html.find("#imageUrl").val();
                         if (imageUrl) {
-                            generateImageDisplayScript(imageUrl);
+                            const waitUntilFinished = html.find("#waitUntilFinished")[0].checked;
+                            const duration = parseInt(html.find("#duration").val());
+                            const slideDuration = parseInt(html.find("#slideDuration").val());
+                            const startX = parseInt(html.find("#startX").val());
+                            const endX = parseInt(html.find("#endX").val());
+                            const startY = parseInt(html.find("#startY").val());
+                            const endY = parseInt(html.find("#endY").val());
+                            const easeMode = html.find("#easeMode").val();
+                            const fadeIn = parseInt(html.find("#fadeIn").val());
+                            const fadeOut = parseInt(html.find("#fadeOut").val());
+                            generateImageDisplayScript(imageUrl, {
+                                waitUntilFinished: waitUntilFinished,
+                                duration: duration, slideDuration: slideDuration,
+                                fadeIn: fadeIn, fadeOut: fadeOut,
+                                startX: startX, endX: endX,
+                                startY: startY, endY: endY,
+                                easeMode: easeMode
+                            });
                         } else {
                             ui.notifications.warn("No URL provided. Action not added.");
                         }
@@ -923,27 +990,17 @@ function addImageDisplayAction() {
             }, default: "submit"
         }).render(true);
     }
-    function generateImageDisplayScript(imageUrl) {
-        cutsceneActions.push(`//IMAGE - DISPLAY (#TODO: BROKEN)
-        .thenDo( async function(){
-            new Dialog({
-                title: "Image Display",
-                content: \`
-                    <div style="text-align: center; height: 400px">
-                        <img src="${imageUrl}" style="border: 0; width: auto; height: auto; max-width: 100%; max-height: 400px;" />
-                    </div>\`,
-                buttons: {
-                    close: {
-                        label: "Close",
-                        callback: () => {}
-                    }
-                },
-                default: "close",
-                render: html => {
-                    console.log("Displaying image to all players.");
-                }
-            },{height : 500}).render(true);})
-        `);
+    function generateImageDisplayScript(imageUrl, { waitUntilFinished = false, fadeIn = 0, fadeOut = 0, duration = 10000, startX = 0, endX = 0, startY = 0, endY = 0, slideDuration = 5000, easeMode } = {}) {
+        cutsceneActions.push(`//IMAGE
+        .effect()
+        .file("${imageUrl}")
+        .screenSpace()
+        ${startX !== 0 || endX !== 0 ? `.animateProperty("sprite","position.x",{from: ${startX}, to: ${endX}, duration: ${slideDuration} ${easeMode ? `,ease: "easeInOut${easeMode}"` : ''}})` : ''}
+        ${startY !== 0 || endY !== 0 ? `.animateProperty("sprite","position.y",{from: ${startY}, to: ${endY}, duration: ${slideDuration} ${easeMode ? `,ease: "easeInOut${easeMode}"` : ''}})` : ''}
+        ${fadeIn ? `.fadeIn(${fadeIn} ${easeMode ? `,{ease: "easeIn${easeMode}"}` : ''})` : ''}
+        .duration(${duration})
+        ${fadeOut ? `.fadeOut(${fadeOut} ${easeMode ? `,{ease: "easeOut${easeMode}"}` : ''})` : ''}
+        ${waitUntilFinished ? `.waitUntilFinished()` : ''}`.trim());
         console.log("Image display action added to the cutscene script.");
         openInitialDialog();
     }
@@ -1171,7 +1228,7 @@ function addShowModalAction() {
           <label for="modalPicture">Picture:</label>
           <input type="text" id="modalPicture" name="modalPicture" style="width: 100%;" value="${portrait}">
         </div>
-        ${waitUntilFinishedHtml()}
+        ${waitUntilFinishedHtml}
       </form>
       <p>This can be used for a modal popup, or a speech insert. Leave the picture blank for a modal popup.</p>
     `, buttons: {
@@ -1255,10 +1312,7 @@ const escapeQuotes = unsafe => {
         ;
 };
 
-function waitUntilFinishedHtml() {
-    return `<div class="form-group">
+const waitUntilFinishedHtml = `<div class="form-group">
     <label for="waitUntilFinished">Wait for Completion:</label>
     <input type="checkbox" id="waitUntilFinished" name="waitUntilFinished" style="margin-top: 5px;" checked>
-</div>
-`;
-}
+</div>`;
