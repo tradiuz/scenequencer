@@ -1,0 +1,11 @@
+Since you have the issue tracker disabled,
+this was the simplest way I could think to
+send you a message.
+
+You made a fork of a fork so you might not
+know this was originally my repo that you
+cloned from another user.
+
+This is outdated and has been replaced by
+
+https://github.com/cyelis1224/cutscene-maker
