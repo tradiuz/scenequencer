@@ -1,5 +1,5 @@
 /*
-Requires Advanced Macros, FXMaster, and the two helper macros for player side UI things (modal and hide UI)
+Requires Advanced Macros, FXMaster, and the one helper macros for player side UI things (hide UI)
 */
 
 let cutsceneActions = [];
@@ -1217,12 +1217,16 @@ function addShowModalAction() {
           <input type="text" id="modalHeader" name="modalHeader" style="width: 100%;" value="${name}">
         </div>
         <div class="form-group">
-          <label for="modalDescription">Description/Text:</label>
-          <textarea id="modalDescription" name="modalDescription" rows="4" style="width: 100%;"></textarea>
+          <label for="modalBody">Description/Text:</label>
+          <textarea id="modalBody" name="modalBody" rows="4" style="width: 100%;"></textarea>
         </div>
         <div class="form-group">
-          <label for="modalDuration">Duration (ms):</label>
-          <input type="number" id="modalDuration" name="modalDuration" style="width: 100%;" value=5000 step=100>
+          <label for="modalGlitch">Glitch Text (opt):</label>
+          <textarea id="modalGlitch" name="modalGlitch" rows="4" style="width: 100%;"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="modalDuration">Duration (<b>s</b>):</label>
+          <input type="number" id="modalDuration" name="modalDuration" style="width: 100%;" value=30 step=1>
         </div>
         <div class="form-group">
           <label for="modalPicture">Picture:</label>
@@ -1235,13 +1239,76 @@ function addShowModalAction() {
             ok: {
                 label: "Add", callback: html => {
                     const modalHeader = html.find("#modalHeader").val();
-                    const description = html.find("#modalDescription").val().replace(/\n/g, '<br>');
+                    const modalBody = html.find("#modalBody").val();
+                    const modalGlitch = html.find("#modalGlitch").val();
                     const duration = html.find("#modalDuration").val();
                     const modalPicture = html.find("#modalPicture").val() ?? '';
                     const waitUntilFinished = html.find("#waitUntilFinished")[0].checked;
+
+                    const lines = modalBody.split(/[\r\n]+/).map(line => line = `{
+                        text: \`${line}\`,
+                        fontSize: '1em',
+                        },`);
+                    const glitch = modalGlitch.split(/[\r\n]+/).map(line => line = `{
+                        text: \`${line}\`,
+                        fontSize: '1em',
+                        },`);
                     cutsceneActions.push(`// MODAL
-    .macro("modal-popup",{title: \`${modalHeader}\`, body: \`${description}\`, duration: '${duration}' ${modalPicture ? `, picture: '${modalPicture}'` : ''}})
-    ${waitUntilFinished ? `.wait(${duration})` : ''}
+    .thenDo(async function(){
+    const overlayConfig = {
+        positionX: 'center',
+        positionY: 'center',
+        closeTime: ${duration},
+        closeAllWindows: false,
+        blockInteractions: false
+    }
+    ${lines.length > 0 ? `const textConfig = {
+        blackBars: false,
+        typingTime: 2,
+        delay: 0,
+        lines: [${lines}]
+    }`: ``}
+    ${glitch.length > 0 ? `
+    const glitchConfig = {
+        typingTime: 3,
+        blackBars: false,
+        aboveUi: false,
+        glitchEffect: { time: 1 },
+        lines: [${glitch}]
+    }`: ``}
+    
+    const anarchistOverlay = game.modules.get('anarchist-overlay');
+
+    let body = await anarchistOverlay.createTextCrawlHtml(textConfig);
+    let glitch = await anarchistOverlay.createTextCrawlHtml(glitchConfig);
+    textHtml = \`
+    <div style="
+    padding: 10px;
+    column-gap: 10px; 
+    display: grid;
+    grid-template-columns: ${modalPicture ? `33%` : ``} 1fr;
+    grid-template-rows: 2em 1fr;
+    min-height: 33%; 
+    width: 50%; 
+    background: rgba(0,0,0,.9); 
+    font-family: Courier New; 
+    transition: opacity 1s; 
+    border-radius: 25px; 
+    border: thick double var(--primary-color); 
+    color: var(--primary-color); 
+    align-items: center; 
+    font-size: 2em">
+    ${modalPicture ? `<div  style="min-height: 100%; grid-area: 1/1/3/2; border-radius:15px; background:url('${modalPicture}') ; background-size: contain; background-position: center; background-repeat: no-repeat; background-color: rgba(from var(--primary-color) r g b / 15%);"></div>` : ``}
+    <div style="grid-area: ${modalPicture ? `1/2/2/3` : `1/1/2/2`};"><h2 style="font-family: 'Bruno Ace'; text-align: center">${modalHeader}</h2></div>
+    <div style="grid-area: ${modalPicture ? `2/2/3/3` : `2/1/3/2`};">${lines.length > 0 ? `<p>\${body}</p>` : ``}${glitch.length > 0 ? `<p>\${glitch}</p>` : ``}</div>
+    </div>
+    \`
+    
+
+    anarchistOverlay.createOverlay(overlayConfig, textHtml);
+    })
+    
+    ${waitUntilFinished ? `.wait(${duration * 1000})` : ''}
                     `);
                     ui.notifications.info("Room Key added to the cutscene script.");
                     openInitialDialog();
