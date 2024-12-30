@@ -18,13 +18,13 @@ This fork was redone to leverage sequencer to make all actions serialized.
 - **Light State**: Toggle lights on or off, simulating changes in the environment.
 - **Ambient Sound**: Control ambient sounds to enhance the atmosphere.
 - **Image Display**: Show images to players for storytelling or clues.
-- **Animations**: Play animations for spell effects, environmental changes, etc. (Requires the Sequencer Module)
+- **Animations**: Play animations for spell effects, environmental changes, etc.
 - **Sound Playback**: Include sound effects or voiceovers.
 - **Playlist Control**: Change the background music playlist to match the mood.
 - **Fade In/Out**: Gradually fade the screen to or from black for transitions.
 - **UI Control**: Hide or show the UI for an immersive experience. (requires extra setup with modify-ui.js macro)
 - **Weather/Particle Effects**: Simulate weather or special particle effects.
-- **Modal Popup**: Display a location banner or room key for new scene introductions. (requires extra setup with the modal-popup.js macro)
+- **Modal Popup**: Display a location banner or room key for new scene introductions. (requires Anarchist Overlay)
 - **Run Macro**: Execute other macros as part of the cutscene.
 - **Wait**: Add pauses or delays between actions for timing control.
 - **Export Macro**: Easily export the created cutscene as a Foundry VTT macro.
@@ -37,9 +37,9 @@ This fork was redone to leverage sequencer to make all actions serialized.
 
 ### Helper Macros
 
-1. Paste the contents of modify-ui.js into a macro called `modify-ui` and the contents of modal-popup.js into a macro called `modal-popup`
-2. Configure the ownership of `modal-popup` and `modify-ui` to be "limited" for all players.  
-3. Configure both to execute as all users.
+1. Paste the contents of modify-ui.js into a macro called `modify-ui`
+2. Configure the ownership of `modify-ui` to be "limited" for all players.  
+3. Configure to execute as all users.
 
 ## Usage
 
