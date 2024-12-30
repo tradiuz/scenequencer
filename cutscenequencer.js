@@ -1,5 +1,5 @@
 /*
-Requires Advanced Macros, FXMaster, and the one helper macros for player side UI things (hide UI)
+Requires Advanced Macros, FXMaster, Anarchist Overlay, and the one helper macros for player side UI things (hide UI)
 */
 
 let cutsceneActions = [];
@@ -82,11 +82,7 @@ function openInitialDialog() {
             html.find("#animationButton").click(() => closeDialogAndExecute(addAnimationAction));
             html.find("#soundButton").click(() => closeDialogAndExecute(addPlaySoundAction));
             html.find("#playlistButton").click(() => closeDialogAndExecute(addPlayPlaylistAction));
-            //html.find("#fadeoutButton").click(() => closeDialogAndExecute(addFadeAction(0)));
             html.find("#fadeCanvasButton").click(() => closeDialogAndExecute(addCanvasFadeAction));
-            //html.find("#fadeinButton").click(() => closeDialogAndExecute(addFadeAction(1)));
-            //html.find("#hideUIButton").click(() => closeDialogAndExecute(addUIAction(0)));
-            //html.find("#showUIButton").click(() => closeDialogAndExecute(addUIAction(1)));
             html.find("#uiVisibilityButton").click(() => closeDialogAndExecute(addUIAction));
             html.find("#showModalButton").click(() => closeDialogAndExecute(addShowModalAction));
             html.find("#finishButton").click(() => closeDialogAndExecute(outputCutsceneScript));
