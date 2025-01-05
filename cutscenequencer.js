@@ -1064,15 +1064,18 @@ function addPlaySoundAction() {
           <label for="soundUrl">Sound File Location (URL/Relative Path):</label>
           <input type="text" id="soundUrl" name="soundUrl" placeholder="http://example.com/sound.mp3" style="width: 100%;">
         </div>
+        ${waitUntilFinishedHtml}
       </form>
       <p>Enter the URL of the sound file you wish to play.</p>
     `, buttons: {
             play: {
                 label: "Add Sound", callback: html => {
                     const soundUrl = html.find("#soundUrl").val();
-                    cutsceneActions.push(`
+                    const waitUntilFinished = html.find("#waitUntilFinished")[0].checked;
+                    cutsceneActions.push(`//SOUND
     .sound()  
         .file("${soundUrl}")
+        ${waitUntilFinished ? `.waitUntilFinished()` : ''}
           `.trim());
                     ui.notifications.info("Sound play action added to the cutscene script.");
                     openInitialDialog();
@@ -1244,11 +1247,11 @@ function addShowModalAction() {
                     const lines = modalBody.split(/[\r\n]+/).map(line => line = `{
                         text: \`${line}\`,
                         fontSize: '1em',
-                        },`);
+                        }`);
                     const glitch = modalGlitch.split(/[\r\n]+/).map(line => line = `{
                         text: \`${line}\`,
                         fontSize: '1em',
-                        },`);
+                        }`);
                     cutsceneActions.push(`// MODAL
     .thenDo(async function(){
     const overlayConfig = {
@@ -1260,7 +1263,7 @@ function addShowModalAction() {
     }
     ${lines.length > 0 ? `const textConfig = {
         blackBars: false,
-        typingTime: 2,
+        typingTime: 1,
         delay: 0,
         lines: [${lines}]
     }`: ``}
